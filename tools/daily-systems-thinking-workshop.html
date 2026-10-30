@@ -1,0 +1,672 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>일상의 시스템사고 워크숍</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@600;700&display=swap">
+<style>
+/* 레이아웃: 상단 고정 단계 표시줄 + 한 단계씩 보이는 작업 패널(세로 흐름). 인과지도 단계만 2열. */
+:root{
+  --bg:#eef3f1; --panel:#ffffff; --panel2:#f5f8f7; --fg:#182524; --muted:#5a6e6c; --line:#d3dedb; --line2:#e4ebe9;
+  --accent:#0d6b67; --accent-ink:#ffffff; --accent-soft:#d9eeec;
+  --r:#bf4f2b; --r-soft:#f7e3dc; --b:#2b5fae; --b-soft:#dde7f7; --warn:#a6701a; --warn-soft:#f6ead3; --ok:#2f7a4a; --g:#2f7a4a; --g-soft:#dcefe1;
+  --display:"Noto Serif KR","Apple SD Gothic Neo",serif; --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --radius:10px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0f1716; --panel:#172120; --panel2:#1d2928; --fg:#e4ecea; --muted:#95a8a5; --line:#2b3a38; --line2:#223130;
+  --accent:#4db5ae; --accent-ink:#0b1514; --accent-soft:#17403d;
+  --r:#ea8862; --r-soft:#40221a; --b:#7ea6e8; --b-soft:#1c2c48; --warn:#dca24a; --warn-soft:#3b2d12; --ok:#6cc48a; --g:#6cc48a; --g-soft:#1d3a28; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0f1716; --panel:#172120; --panel2:#1d2928; --fg:#e4ecea; --muted:#95a8a5; --line:#2b3a38; --line2:#223130;
+  --accent:#4db5ae; --accent-ink:#0b1514; --accent-soft:#17403d;
+  --r:#ea8862; --r-soft:#40221a; --b:#7ea6e8; --b-soft:#1c2c48; --warn:#dca24a; --warn-soft:#3b2d12; --ok:#6cc48a; --g:#6cc48a; --g-soft:#1d3a28; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.6;margin:0;
+  padding-block:0 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1060px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.3}
+h1{font-size:1.55rem;font-weight:700}
+h2{font-size:1.3rem}
+h3{font-size:1.05rem;font-family:var(--body);font-weight:600}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+textarea,input[type=text],select{width:100%;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:9px 11px;min-width:0}
+textarea{resize:vertical;min-height:74px}
+textarea:focus,input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+label.f{display:block;font-weight:600;font-size:.92rem;margin-bottom:5px}
+.hint{color:var(--muted);font-size:.86rem}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:600;white-space:nowrap}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.small{padding:4px 10px;font-size:.84rem;font-weight:500}
+.btn.danger{color:var(--r)}
+.btn[disabled]{opacity:.45;cursor:default}
+
+header.top{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;padding-block:22px 10px}
+.eyebrow{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600}
+.sub{color:var(--muted);font-size:.92rem;margin-top:4px;max-width:60ch}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tools select{width:auto;padding:7px 10px}
+
+nav.steps{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-block:8px 18px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding-block:8px;z-index:5}
+nav.steps button{border:0;background:transparent;border-top:3px solid var(--line);padding:8px 4px 2px;text-align:left;cursor:pointer;color:var(--muted);font-size:.8rem;line-height:1.3;min-width:0}
+nav.steps button b{display:block;font-size:.72rem;letter-spacing:.05em;color:inherit}
+nav.steps button span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+nav.steps button.done{border-top-color:var(--accent);color:var(--fg)}
+nav.steps button.active{border-top-color:var(--accent);color:var(--accent);font-weight:600}
+@media (max-width:640px){ nav.steps button span{display:none} nav.steps button{padding:6px 2px 0} }
+
+section.step{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px clamp(16px,3vw,30px) 26px}
+.step-head{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;margin-bottom:6px}
+.step-num{font-family:var(--display);color:var(--accent);font-size:1.6rem;font-weight:700;font-variant-numeric:tabular-nums}
+.lead{color:var(--muted);max-width:68ch;margin-bottom:20px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.field{margin-bottom:16px;min-width:0}
+.facil{border-left:3px solid var(--accent);background:var(--panel2);border-radius:0 10px 10px 0;padding:12px 16px;margin-block:18px}
+.facil summary{cursor:pointer;font-weight:600;font-size:.9rem;color:var(--accent)}
+.facil ul{margin:8px 0 0;padding-left:18px;font-size:.9rem}
+.radios{display:flex;gap:8px;flex-wrap:wrap}
+.radios label{border:1px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer;font-size:.9rem;display:inline-flex;gap:6px;align-items:center}
+.radios input{margin:0}
+.radios label:has(input:checked){background:var(--accent-soft);border-color:var(--accent);color:var(--fg)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chip{border:1px dashed var(--line);border-radius:999px;padding:3px 11px;font-size:.84rem;cursor:pointer;background:transparent;color:var(--muted)}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+
+/* 빙산 */
+.iceberg{display:grid;gap:12px}
+.layer{display:grid;grid-template-columns:140px 1fr;gap:14px;align-items:start;padding:14px;border-radius:var(--radius);border:1px solid var(--line2)}
+.layer:nth-child(1){background:var(--panel)}
+.layer:nth-child(2){background:color-mix(in srgb,var(--accent-soft) 35%,var(--panel))}
+.layer:nth-child(3){background:color-mix(in srgb,var(--accent-soft) 65%,var(--panel))}
+.layer:nth-child(4){background:var(--accent-soft)}
+.layer .lt b{display:block;font-size:.95rem}
+.layer .lt span{font-size:.8rem;color:var(--muted)}
+@media (max-width:560px){ .layer{grid-template-columns:1fr} }
+.bot{display:grid;grid-template-columns:1fr;gap:10px}
+.bot svg{width:100%;max-width:520px;height:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px;cursor:crosshair;touch-action:none}
+.bot .presets{display:flex;gap:6px;flex-wrap:wrap}
+
+/* 변수 */
+.vars{list-style:none;padding:0;margin:0;display:grid;gap:6px}
+.vars li{display:flex;gap:10px;align-items:center;border:1px solid var(--line2);border-radius:8px;padding:6px 10px;background:var(--panel2)}
+.vars li .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+.vars li.core{border-color:var(--accent);background:var(--accent-soft)}
+.star{border:0;background:transparent;cursor:pointer;font-size:1.05rem;color:var(--muted);padding:2px 6px}
+.vars li.core .star{color:var(--accent)}
+.addrow{display:flex;gap:8px;margin-top:10px}
+.addrow input{flex:1}
+
+/* 인과지도 */
+.cld{display:grid;grid-template-columns:300px 1fr;gap:18px}
+@media (max-width:860px){ .cld{grid-template-columns:1fr} }
+.linkform{display:grid;gap:10px;background:var(--panel2);padding:14px;border-radius:var(--radius);border:1px solid var(--line2)}
+.signsel{display:flex;gap:6px}
+.signsel button{flex:1;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:8px;cursor:pointer;font-weight:700;font-size:1.05rem}
+.signsel button.on.pos{background:var(--r-soft);border-color:var(--r);color:var(--r)}
+.signsel button.on.neg{background:var(--b-soft);border-color:var(--b);color:var(--b)}
+.canvas{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);overflow:hidden;min-width:0}
+.canvas svg{width:100%;height:auto;display:block;touch-action:none;font-family:var(--body)}
+.canvas .bar{display:flex;gap:8px;justify-content:space-between;align-items:center;padding:8px 10px;border-top:1px solid var(--line2);font-size:.84rem;color:var(--muted);flex-wrap:wrap}
+.links{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:4px;font-size:.88rem}
+.links li{display:flex;gap:8px;align-items:center;padding:4px 8px;border-radius:6px;background:var(--panel2)}
+.links li .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.pill{display:inline-block;border-radius:999px;padding:0 8px;font-size:.78rem;font-weight:700;line-height:1.5}
+.pill.pos{background:var(--r-soft);color:var(--r)} .pill.neg{background:var(--b-soft);color:var(--b)}
+.pill.R{background:var(--r-soft);color:var(--r)} .pill.B{background:var(--b-soft);color:var(--b)}
+.loops{display:grid;gap:8px;margin-top:14px}
+.loop{border:1px solid var(--line2);border-radius:var(--radius);padding:10px 12px;display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start}
+.loop .lab{font-weight:700;font-size:1.05rem;font-variant-numeric:tabular-nums}
+.loop{cursor:pointer;position:relative}
+.loop.R.vicious .lab{color:var(--r)} .loop.R.virtuous .lab{color:var(--b)} .loop.B .lab{color:var(--g)}
+.loop.focus.R.vicious{background:var(--r-soft);border-color:var(--r)} .loop.focus.R.virtuous{background:var(--b-soft);border-color:var(--b)} .loop.focus.B{background:var(--g-soft);border-color:var(--g)}
+.loop .kind{display:flex;gap:4px;margin-top:6px}
+.loop .kind button{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:1px 9px;font-size:.76rem;cursor:pointer;color:var(--muted)}
+.loop .kind button.on.v{background:var(--r);border-color:var(--r);color:#fff} .loop .kind button.on.p{background:var(--b);border-color:var(--b);color:#fff}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:.8rem;color:var(--muted);align-items:center}
+.legend i{display:inline-block;width:22px;height:4px;border-radius:2px;vertical-align:middle;margin-right:4px}
+.acard .mini{width:100%;height:auto;display:block;background:var(--panel2);border-radius:8px;margin-top:2px}
+.acard .mini text{font-family:var(--body)}
+@media print{ body{background:#fff;padding:0} header.top,nav.steps,footer.nav,#ioPanel,.tools,details.facil,.toast,section.step:not([data-step="6"]){display:none!important} section.step[data-step="6"]{display:block!important;border:0;padding:0;box-shadow:none} section.step[data-step="6"] .grid,section.step[data-step="6"] .lead,section.step[data-step="6"] .step-head{display:none!important} .report{border:0;padding:0} .report svg{max-height:120mm} }
+.loop .path{font-size:.9rem;word-break:keep-all}
+.loop .meaning{font-size:.84rem;color:var(--muted)}
+.x{border:0;background:transparent;cursor:pointer;color:var(--muted);padding:0 4px;font-size:1rem}
+.x:hover{color:var(--r)}
+
+/* 원형 */
+.arch{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.acard{border:1px solid var(--line);border-radius:var(--radius);padding:14px;cursor:pointer;background:var(--panel);display:grid;gap:8px;align-content:start}
+.acard:hover{border-color:var(--accent)}
+.acard.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 1px var(--accent) inset}
+.acard.sug{border-style:dashed}
+.acard h3{font-size:1rem}
+.acard .sig{font-size:.78rem;color:var(--muted)}
+.acard ul{margin:0;padding-left:16px;font-size:.84rem;color:var(--muted)}
+.acard .lv{font-size:.84rem;border-top:1px dashed var(--line2);padding-top:6px}
+.tag{font-size:.74rem;background:var(--warn-soft);color:var(--warn);border-radius:4px;padding:0 6px;font-weight:600}
+
+/* 지렛대 */
+.ladder{display:grid;gap:4px;margin-block:8px 18px}
+.rung{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:8px 12px;border-radius:8px;border:1px solid var(--line2);background:var(--panel2);font-size:.88rem}
+.rung .k{font-family:var(--display);font-weight:700;font-size:1.1rem;color:var(--accent);font-variant-numeric:tabular-nums}
+.rung .nm{font-weight:600}
+.rung .ex{color:var(--muted);font-size:.8rem;display:block}
+.rung .bar{height:8px;border-radius:4px;background:var(--accent);opacity:.9;width:calc(var(--p) * 90px)}
+.lever{border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px;display:grid;gap:6px;margin-top:8px}
+.lever .h{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lever .h b{flex:1;min-width:0}
+.lever .checks{display:flex;gap:10px;flex-wrap:wrap;font-size:.84rem}
+.lever .checks label{display:inline-flex;gap:4px;align-items:center;cursor:pointer}
+.score{font-size:.82rem;padding:6px 10px;border-radius:6px;background:var(--panel2)}
+.score.good{color:var(--ok)} .score.warn{color:var(--warn)}
+
+/* 요약 */
+.report{border:1px solid var(--line);border-radius:var(--radius);padding:22px clamp(14px,3vw,28px);background:var(--panel)}
+.report h2{margin-bottom:4px}
+.report .meta{color:var(--muted);font-size:.86rem;margin-bottom:16px}
+.report h3{margin-top:18px;margin-bottom:6px;color:var(--accent);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase}
+.report p,.report li{font-size:.94rem}
+.report ul{margin:0;padding-left:18px}
+.report svg{width:100%;height:auto;border:1px solid var(--line2);border-radius:8px}
+.empty{color:var(--muted);font-style:italic;font-size:.9rem}
+
+footer.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-top:10px;display:grid;gap:10px}
+.toast{position:fixed;left:50%;bottom:max(20px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:8px 16px;border-radius:999px;font-size:.88rem;opacity:0;transition:opacity .2s;pointer-events:none;z-index:20}
+.toast.show{opacity:1}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important} }
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div>
+    <div class="eyebrow">미래학교자치연구소 · 시스템사고분과</div>
+    <h1>일상의 시스템사고 워크숍</h1>
+    <p class="sub">나·가정·학교·사회에서 반복되는 문제 하나를 골라, 사건에서 구조로 내려가 인과순환지도를 그리고 지렛대를 찾는 일곱 단계입니다.</p>
+  </div>
+  <div class="tools">
+    <select id="sampleSel" aria-label="예시 불러오기">
+      <option value="">예시 불러오기…</option>
+      <option value="0">가정 · 자녀 스마트폰 갈등</option>
+      <option value="1">학교 · 행정 업무와 수업 준비</option>
+      <option value="2">사회 · 청소년 SNS와 수면</option>
+    </select>
+    <button class="btn" id="btnIO">저장·불러오기</button>
+    <button class="btn danger" id="btnReset">처음부터</button>
+  </div>
+</header>
+<div class="panel" id="ioPanel" hidden>
+  <p class="hint">아래 글상자의 내용이 지금 작업의 전체 기록(JSON)입니다. 복사해 두었다가 다시 붙여 넣고 '적용'을 누르면 이어서 할 수 있습니다. 이 기기에서는 자동으로 임시 저장됩니다.</p>
+  <textarea id="ioText" rows="6" spellcheck="false"></textarea>
+  <div class="tools">
+    <button class="btn" id="btnCopyJSON">복사</button>
+    <button class="btn primary" id="btnApplyJSON">붙여 넣은 내용 적용</button>
+  </div>
+</div>
+
+<nav class="steps" id="stepNav"></nav>
+
+<!-- 0 문제 정의 -->
+<section class="step" data-step="0">
+  <div class="step-head"><span class="step-num">1</span><h2>문제 정하기</h2></div>
+  <p class="lead">반복해서 나를 괴롭히지만 아직 풀리지 않은 문제를 하나 고릅니다. 사람 탓이 아니라 상황을 말하는 문장으로 적어 보세요.</p>
+  <div class="field"><label class="f">이 문제는 어디에 있나요?</label>
+    <div class="radios" id="domainRadios">
+      <label><input type="radio" name="domain" value="나">나 자신</label>
+      <label><input type="radio" name="domain" value="가정">가정</label>
+      <label><input type="radio" name="domain" value="학교">학교</label>
+      <label><input type="radio" name="domain" value="사회">사회</label>
+    </div></div>
+  <div class="field"><label class="f" for="f_title">문제를 한 문장으로</label><input type="text" id="f_title" placeholder="예: 매번 다짐하지만 운동이 한 달을 넘기지 못한다"></div>
+  <div class="grid g2">
+    <div class="field"><label class="f" for="f_situation">지금 어떤 일이 일어나고 있나요?</label><textarea id="f_situation" placeholder="눈에 보이는 상황을 구체적으로"></textarea></div>
+    <div class="field"><label class="f" for="f_desired">바라는 상태는 무엇인가요?</label><textarea id="f_desired" placeholder="문제가 풀렸다면 무엇이 달라져 있을까요?"></textarea></div>
+  </div>
+  <div class="grid g2">
+    <div class="field"><label class="f" for="f_duration">얼마나 오래된 문제인가요?</label>
+      <select id="f_duration"><option value="">선택</option><option>몇 주</option><option>몇 달</option><option>1년 안팎</option><option>여러 해</option></select>
+      <p class="hint">오래 반복된 문제일수록 구조가 만들어 내는 패턴일 가능성이 큽니다.</p></div>
+    <div class="field"><label class="f" for="f_tried">지금까지 해 본 해결책과 그 결과</label><textarea id="f_tried" placeholder="잠깐 좋아졌다가 다시 돌아온 해결책이 있다면 꼭 적어 두세요"></textarea></div>
+  </div>
+  <details class="facil"><summary>진행자 질문</summary><ul>
+    <li>"누가 문제다"가 아니라 "무엇이 반복된다"로 바꿔 말하면 어떻게 되나요?</li>
+    <li>이 문제가 사라지면 누가 가장 먼저 알아차릴까요?</li>
+    <li>해결책을 썼는데 되돌아온 경험이 있다면, 그때 무엇이 함께 변했나요?</li></ul></details>
+</section>
+
+<!-- 1 빙산 -->
+<section class="step" data-step="1" hidden>
+  <div class="step-head"><span class="step-num">2</span><h2>빙산 아래로 내려가기</h2></div>
+  <p class="lead">눈에 보이는 사건은 빙산의 꼭대기입니다. 시간에 따른 패턴, 패턴을 만드는 구조, 구조를 떠받치는 마음의 모델까지 네 층을 내려갑니다.</p>
+  <div class="iceberg">
+    <div class="layer"><div class="lt"><b>사건</b><span>무슨 일이 일어났나?</span></div><textarea id="f_events" placeholder="최근에 일어난 구체적인 일 한두 가지"></textarea></div>
+    <div class="layer"><div class="lt"><b>패턴</b><span>시간에 따라 어떻게 변해 왔나?</span></div>
+      <div class="bot">
+        <div><label class="f" for="f_botLabel">세로축에 놓을 변수</label><input type="text" id="f_botLabel" placeholder="예: 주당 운동 횟수, 자녀와 대화 시간"></div>
+        <p class="hint">그래프 위를 눌러 점을 찍거나, 아래 모양을 골라 지난 시간의 흐름을 그려 보세요.</p>
+        <svg id="botSvg" viewBox="0 0 520 220" role="img" aria-label="시간에 따른 변화 그래프"></svg>
+        <div class="presets">
+          <button class="chip" data-shape="up">점점 늘어남</button><button class="chip" data-shape="down">점점 줄어듦</button>
+          <button class="chip" data-shape="osc">오르락내리락</button><button class="chip" data-shape="boom">급등 후 하락</button>
+          <button class="chip" data-shape="saw">좋아졌다 나빠지기 반복</button><button class="chip" data-shape="plateau">늘다가 정체</button>
+          <button class="chip" data-shape="clear">지우기</button>
+        </div>
+        <textarea id="f_pattern" placeholder="그래프를 말로 풀면? 언제부터 이런 흐름이었나요?"></textarea>
+      </div></div>
+    <div class="layer"><div class="lt"><b>구조</b><span>무엇이 이 패턴을 만드나?</span></div><textarea id="f_structure" placeholder="관계, 규칙, 시간표, 자원, 보상과 처벌, 정보가 흐르는 방식…"></textarea></div>
+    <div class="layer"><div class="lt"><b>마음의 모델</b><span>어떤 믿음이 이 구조를 당연하게 만드나?</span></div><textarea id="f_mental" placeholder="예: '쉬면 뒤처진다', '아이는 통제해야 한다', '업무는 원래 많다'"></textarea></div>
+  </div>
+  <details class="facil"><summary>진행자 질문</summary><ul>
+    <li>그래프의 모양이 '오르락내리락'이라면 어떤 힘이 끌어올리고 어떤 힘이 끌어내리나요?</li>
+    <li>구조 칸에 적힌 것 중 내가 바꿀 수 있는 것과 없는 것은 무엇인가요?</li>
+    <li>마음의 모델을 반대로 뒤집어 보면 어떤 구조가 가능해지나요?</li></ul></details>
+</section>
+
+<!-- 2 변수 -->
+<section class="step" data-step="2" hidden>
+  <div class="step-head"><span class="step-num">3</span><h2>변수 찾기</h2></div>
+  <p class="lead">구조를 이루는 요소를 '늘거나 줄 수 있는 양'으로 적습니다. 핵심 변수 하나에 별표를 붙이세요. 다섯에서 여덟 개면 충분합니다.</p>
+  <div class="grid g2">
+    <div>
+      <ul class="vars" id="varList"></ul>
+      <div class="addrow"><input type="text" id="varInput" placeholder="예: 수업 준비 시간, 자녀의 반발심"><button class="btn primary" id="btnAddVar">추가</button></div>
+      <p class="hint" style="margin-top:8px">좋은 변수 이름: 명사형 · 증감이 가능 · 중립적 표현 ("게으름" 대신 "휴식 시간", "잔소리" 대신 "통제 시도 횟수")</p>
+    </div>
+    <div>
+      <label class="f">이런 변수가 자주 등장합니다</label>
+      <div class="chips" id="varChips"></div>
+      <details class="facil"><summary>진행자 질문</summary><ul>
+        <li>이 문제에서 시간이 지나며 늘거나 준 것은 무엇인가요?</li>
+        <li>내가 그 양을 보고 '좋아졌다·나빠졌다'를 판단하는 기준 변수는 무엇인가요?</li>
+        <li>눈에 보이지 않지만 분명히 변하는 것(신뢰, 피로, 자신감)은 없나요?</li></ul></details>
+    </div>
+  </div>
+</section>
+
+<!-- 3 인과지도 -->
+<section class="step" data-step="3" hidden>
+  <div class="step-head"><span class="step-num">4</span><h2>인과순환지도 그리기</h2></div>
+  <p class="lead">변수 둘을 골라 화살표로 잇습니다. 원인이 늘 때 결과도 늘면 <b>+</b>, 반대로 움직이면 <b>−</b>. 고리가 닫히면 강화(R)인지 균형(B)인지 자동으로 표시됩니다.</p>
+  <div class="cld">
+    <div>
+      <div class="linkform">
+        <div><label class="f" for="linkFrom">원인</label><select id="linkFrom"></select></div>
+        <div><label class="f" for="linkTo">결과</label><select id="linkTo"></select></div>
+        <div><label class="f">관계</label>
+          <div class="signsel"><button type="button" class="pos on" data-sign="+" id="signPos">+ 같은 방향</button><button type="button" class="neg" data-sign="-" id="signNeg">− 반대 방향</button></div></div>
+        <label style="display:flex;gap:8px;align-items:center;font-size:.9rem"><input type="checkbox" id="linkDelay"> 효과가 나타나기까지 시간이 걸린다 (지연)</label>
+        <button class="btn primary" id="btnAddLink">화살표 추가</button>
+      </div>
+      <ul class="links" id="linkList"></ul>
+    </div>
+    <div>
+      <div class="canvas">
+        <svg id="cldSvg" viewBox="0 0 720 460" role="img" aria-label="인과순환지도"></svg>
+        <div class="bar"><span><span class="legend"><span>상자를 끌어 옮길 수 있습니다. 부호 <b style="color:var(--r)">+</b> <b style="color:var(--b)">−</b>, ∥는 지연.</span><span><i style="background:var(--r)"></i>악순환 R</span><span><i style="background:var(--b)"></i>선순환 R</span><span><i style="background:var(--g)"></i>균형 B</span><span><i style="background:#8a4fa3"></i>겹침은 혼합색</span><span>고리 서술이나 R·B 기호를 누르면 그 고리만 선명해집니다. 화살표 가운데 점을 끌면 그 화살표의 휨이 바뀌고, 두 번 누르면 자동으로 돌아갑니다.</span></span></span><span style="display:flex;gap:8px;align-items:center"><label for="bendRange" style="font-size:.84rem">휘어짐</label><input type="range" id="bendRange" min="0.3" max="2.5" step="0.1" value="1" style="width:110px"><button class="btn small" id="btnAutoLayout">자동 배치</button></span></div>
+      </div>
+      <div class="loops" id="loopList"></div>
+    </div>
+  </div>
+  <details class="facil"><summary>진행자 질문</summary><ul>
+    <li>강화 고리(R)는 눈덩이처럼 커지는 선순환·악순환입니다. 지금 이 고리는 어느 쪽으로 돌고 있나요?</li>
+    <li>균형 고리(B)는 어떤 목표나 한계를 향해 되돌리는 힘입니다. 그 목표는 누가 정했나요?</li>
+    <li>지연이 있는 화살표에서 우리는 어떤 '성급한 판단'을 하게 되나요?</li></ul></details>
+</section>
+
+<!-- 4 원형 -->
+<section class="step" data-step="4" hidden>
+  <div class="step-head"><span class="step-num">5</span><h2>구조 진단: 시스템 원형</h2></div>
+  <p class="lead">많은 문제가 몇 가지 익숙한 구조를 반복합니다. 내 지도와 가장 닮은 원형을 고르면, 그 원형이 알려진 함정과 지렛대의 방향을 보여 줍니다.</p>
+  <div id="archSummary" class="hint" style="margin-bottom:12px"></div>
+  <div class="arch" id="archGrid"></div>
+  <div class="field" style="margin-top:16px"><label class="f" for="f_archNote">내 문제에서는 이 원형이 어떻게 나타나나요?</label><textarea id="f_archNote" placeholder="원형의 설명을 내 변수 이름으로 다시 써 보세요"></textarea></div>
+  <details class="facil"><summary>진행자 질문</summary><ul>
+    <li>원형이 하나로 딱 맞지 않아도 괜찮습니다. 가장 닮은 부분은 어디인가요?</li>
+    <li>이 원형의 '전형적인 실수'를 나도 하고 있지 않았나요?</li></ul></details>
+</section>
+
+<!-- 5 지렛대 -->
+<section class="step" data-step="5" hidden>
+  <div class="step-head"><span class="step-num">6</span><h2>지렛대 찾기</h2></div>
+  <p class="lead">도넬라 메도즈의 지렛대 목록을 여덟 단으로 간추렸습니다. 아래로 갈수록 작은 힘으로 큰 변화를 만들지만 바꾸기는 어렵습니다. 내 개입이 어느 단에 닿는지 확인해 보세요.</p>
+  <div class="ladder" id="ladder"></div>
+  <div class="linkform" style="margin-bottom:12px">
+    <div class="grid g2">
+      <div><label class="f" for="levTarget">어디에 개입하나요?</label><select id="levTarget"></select></div>
+      <div><label class="f" for="levLevel">지렛대 단</label><select id="levLevel"></select></div>
+    </div>
+    <div><label class="f" for="levAction">무엇을 하나요?</label><input type="text" id="levAction" placeholder="예: 가족이 함께 보는 화면에 사용 시간 표시하기"></div>
+    <button class="btn primary" id="btnAddLever">지렛대 추가</button>
+  </div>
+  <div id="leverList"></div>
+  <details class="facil"><summary>진행자 질문</summary><ul>
+    <li>이 개입은 증상(사건)을 건드리나요, 구조를 건드리나요?</li>
+    <li>이 개입이 다른 고리를 자극해 생기는 부작용은 무엇일까요? 특히 R 고리를 더 빠르게 돌리지는 않나요?</li>
+    <li>효과가 나타나기까지 얼마나 기다려야 하나요? 그동안 포기하지 않으려면 무엇을 보고 있어야 하나요?</li></ul></details>
+</section>
+
+<!-- 6 실천 -->
+<section class="step" data-step="6" hidden>
+  <div class="step-head"><span class="step-num">7</span><h2>첫 걸음과 한 장 요약</h2></div>
+  <p class="lead">지렛대 하나를 골라 이번 주에 할 수 있는 가장 작은 행동으로 바꿉니다. 그리고 효과를 '언제, 어떤 변수로' 확인할지 미리 정합니다.</p>
+  <div class="grid g2">
+    <div class="field"><label class="f" for="f_first">이번 주의 첫 걸음</label><textarea id="f_first" placeholder="작고 구체적으로. 누가 봐도 했는지 안 했는지 알 수 있게"></textarea></div>
+    <div class="field"><label class="f" for="f_who">함께할 사람 · 알릴 사람</label><textarea id="f_who" placeholder="혼자 바꾸기 어려운 구조라면 누구와 이야기해야 하나요?"></textarea></div>
+    <div class="field"><label class="f" for="f_signal">효과를 확인할 변수와 시점</label><textarea id="f_signal" placeholder="예: 3주 뒤, 주당 대화 시간이 늘었는지. 지연을 생각해 너무 이르게 판단하지 않기"></textarea></div>
+    <div class="field"><label class="f" for="f_review">다시 점검하는 날</label><input type="text" id="f_review" placeholder="예: 11월 21일 금요일"></div>
+  </div>
+  <div class="tools" style="margin-bottom:12px"><button class="btn primary" id="btnCopyReport">요약 글로 복사</button><button class="btn" id="btnPrint">PDF 인쇄</button><span class="hint">인쇄 창에서 ‘PDF로 저장’을 고르면 파일로 저장됩니다.</span></div>
+  <div class="report" id="report"></div>
+</section>
+
+<footer class="nav"><button class="btn" id="btnPrev">← 이전</button><button class="btn primary" id="btnNext">다음 →</button></footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+'use strict';
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const STEPS=['문제','빙산','변수','인과지도','원형','지렛대','실천'];
+const DOMAIN_VARS={
+ '나':['수면 시간','운동 횟수','미루는 일의 양','자기 비난','에너지 수준','집중 시간','스마트폰 사용 시간','성취 경험'],
+ '가정':['대화 시간','통제 시도 횟수','자녀의 반발심','신뢰','집안일 분담 정도','스마트폰 사용 시간','부모의 피로','자율성 경험'],
+ '학교':['행정 업무량','수업 준비 시간','수업의 질','학생 참여','교사 소진','학부모 민원','회의 시간','동료 협력'],
+ '사회':['SNS 사용 시간','수면 시간','또래 비교 불안','지역 청년 인구','학교 통폐합','공동체 신뢰','경쟁 압력','공공 지원']};
+const LEVELS=[
+ {k:1,name:'수치·매개변수',desc:'예산, 시간, 벌칙·보상의 크기 같은 숫자를 바꾼다.',ex:'공부 시간 30분 늘리기, 벌점 올리기'},
+ {k:2,name:'완충장치·물리 구조',desc:'여유분, 공간과 동선, 흐름의 물리적 구조를 바꾼다.',ex:'스마트폰을 거실에 두기, 보고 양식 통합'},
+ {k:3,name:'지연 시간',desc:'정보나 효과가 전달되는 데 걸리는 시간을 줄이거나 늘린다.',ex:'학기말 피드백을 매주 피드백으로'},
+ {k:4,name:'피드백 고리의 강도',desc:'악순환은 약하게, 균형 고리는 강하게 만든다.',ex:'작은 성공을 바로 알아차리고 인정하기'},
+ {k:5,name:'정보 흐름',desc:'누가, 무엇을, 언제 알게 되는지를 바꾼다.',ex:'공동 자원의 상태를 모두가 보게 하기'},
+ {k:6,name:'규칙·인센티브',desc:'무엇이 허용되고 무엇이 보상받는지의 규칙을 바꾼다.',ex:'회의 시간 상한, 평가 기준 변경, 함께 정한 약속'},
+ {k:7,name:'목표',desc:'시스템이 무엇을 위해 움직이는지, 목표 자체를 바꾼다.',ex:'"성적 향상"에서 "배움의 즐거움"으로'},
+ {k:8,name:'패러다임·마음의 모델',desc:'문제를 바라보는 전제와 믿음을 바꾼다.',ex:'"통제할 대상"에서 "함께 설계하는 동료"로'}];
+const ARCH=[
+ {id:'fix',name:'미봉책 (응급처치의 실패)',sig:{B:1,R:1},structure:'증상을 빠르게 줄이는 균형 고리(B)가 있지만, 그 처방이 지연을 두고 증상을 다시 키우는 강화 고리(R)를 만든다.',signals:['같은 문제가 반복해서 돌아온다','처방을 쓸 때마다 잠깐 좋아졌다가 더 나빠진다','"이번만 넘기자"는 말이 자주 나온다'],lever:'단기 처방의 부작용 경로를 끊고, 느리지만 근본 원인에 작용하는 고리에 투자한다.'},
+ {id:'shift',name:'부담 떠넘기기',sig:{B:2,R:1},structure:'증상을 푸는 두 균형 고리(대증적·근본적)가 있고, 대증 처방이 근본 역량을 약하게 만드는 부작용 고리(R)가 돈다.',signals:['외부 도움이나 대체 수단에 점점 더 의존한다','스스로 해결하는 힘이 약해진다','근본 대책은 늘 "나중에"로 밀린다'],lever:'대증 처방에 상한을 두고, 근본 역량을 키우는 고리에 시간을 떼어 둔다.'},
+ {id:'limits',name:'성장의 한계',sig:{R:1,B:1},structure:'성장을 만드는 강화 고리(R)가 있고, 성장이 커질수록 제약이 작동하는 균형 고리(B)가 성장을 멈추게 한다.',signals:['처음엔 잘 되다가 어느 순간 정체된다','더 열심히 밀어붙여도 효과가 없다','숨은 제약(체력·시간·관계·공간)이 있다'],lever:'성장 엔진을 더 밀기보다 제약 조건 자체를 찾아 풀어 준다.'},
+ {id:'erode',name:'목표 침식',sig:{B:2},structure:'목표와 현실의 격차를 줄이는 두 고리 중, 현실을 끌어올리기보다 목표를 낮추는 쪽이 쉬워 기준이 서서히 내려간다.',signals:['"현실적으로 이 정도면"이라는 말이 늘었다','기준이 낮아진 것을 한참 뒤에 알아차린다','격차를 설명하는 이유가 쌓인다'],lever:'목표를 바깥에 고정하고(공개 선언, 절대 기준), 현실을 개선하는 고리의 지연을 줄인다.'},
+ {id:'escal',name:'단계적 확대',sig:{B:2,R:1},structure:'두 당사자가 서로의 행동에 반응하며 자극하는 두 균형 고리가 하나의 거대한 강화 고리처럼 돈다.',signals:['상대가 세게 나오니 나도 더 세게 나간다','갈등이나 경쟁의 수위가 점점 높아진다','누구도 먼저 멈추지 못한다'],lever:'한쪽이 먼저 수위를 낮추거나, 공동의 목표와 규칙을 합의해 고리를 끊는다.'},
+ {id:'success',name:'성공한 쪽에 더 많이',sig:{R:2},structure:'한정된 자원이 성과 좋은 쪽으로 몰리면서 한쪽은 강화 고리로 커지고 다른 쪽은 쇠퇴한다.',signals:['잘하는 학생·부서에 기회가 몰린다','뒤처진 쪽은 기회조차 받지 못한다','격차가 스스로 커진다'],lever:'자원 배분 규칙을 바꾸고, 뒤처진 쪽의 첫 성공 경험을 설계한다.'},
+ {id:'commons',name:'공유지의 비극',sig:{R:2,B:1},structure:'각자 자신에게 이익인 행동을 늘리지만, 모두가 쓰는 공동 자원이 바닥나 결국 모두의 이익이 줄어든다.',signals:['각자는 합리적인데 전체는 나빠진다','공동 자원(시간·공간·신뢰·에너지)이 고갈된다','"나 하나쯤은"이 쌓인다'],lever:'공동 자원의 상태를 모두에게 보이게 하고(정보 흐름), 사용 규칙을 함께 정한다.'},
+ {id:'under',name:'성장과 투자 부족',sig:{R:1,B:2},structure:'성장이 역량의 한계에 부딪히는데, 역량 투자가 늦어지거나 성과 기준을 낮춰 투자 필요를 느끼지 못하게 된다.',signals:['수요는 느는데 역량 확충은 늘 뒤늦다','품질 저하를 "원래 그렇다"로 받아들인다','투자 결정이 성과 하락 뒤에야 온다'],lever:'성과 기준을 유지하고, 수요가 나타나기 전에 미리 역량에 투자한다.'}];
+
+const SAMPLES=[
+ {domain:'가정',title:'자녀의 스마트폰 사용을 둘러싼 갈등이 매일 반복된다',situation:'저녁마다 사용 시간을 두고 실랑이가 벌어지고, 결국 소리를 지르거나 폰을 빼앗는 것으로 끝난다.',desired:'아이가 스스로 사용 시간을 조절하고, 저녁 식탁에서 하루 이야기를 나눈다.',duration:'1년 안팎',tried:'사용 시간 앱으로 제한 → 2주 정도 효과, 이후 우회 방법을 찾음. 폰 압수 → 당일은 조용하지만 다음 날 더 심한 반발.',
+  events:'어제 밤 11시에 폰을 빼앗았고 아이가 방문을 잠갔다.',botLabel:'하루 사용 시간(시간)',shape:'saw',pattern:'제한을 걸면 1~2주 줄다가 다시 늘어난다. 톱니 모양이 1년째 반복된다.',structure:'부모의 통제 → 아이의 반발 → 대화 단절 → 아이의 조절 경험 부족. 학원 뒤 유일한 휴식이 폰인 시간표.',mental:'"아이는 통제하지 않으면 끝없이 한다", "지금 잡지 않으면 영영 못 잡는다"',
+  vars:['스마트폰 사용 시간*','부모의 통제 시도','자녀의 반발심','부모-자녀 대화의 질','자녀의 자기조절 경험','자녀의 스트레스'],
+  links:[[0,1,'+',0],[1,0,'-',0],[1,2,'+',0],[2,0,'+',1],[2,3,'-',0],[3,4,'+',1],[4,0,'-',1],[5,0,'+',0],[3,5,'-',0]],
+  arch:'fix',archNote:'통제(B)는 당장 사용 시간을 줄이지만, 반발심이 커지고 대화가 끊기면서 스스로 조절할 기회가 사라져 사용 시간이 다시 는다(R).',
+  levers:[{t:'v1',k:6,a:'사용 규칙을 부모가 정하지 않고 아이와 함께 정하고 종이에 써서 붙이기',c:[1,1,0]},{t:'v3',k:5,a:'저녁 식사 30분은 모두 폰을 거실 바구니에 두기(부모 포함)',c:[1,1,1]},{t:'v4',k:8,a:'"아이가 조절할 수 있을까"를 묻기 전에 "조절해 본 경험을 어떻게 만들어 줄까"로 질문 바꾸기',c:[1,0,1]}],
+  first:'이번 주 토요일 저녁, 폰 이야기가 아니라 "요즘 뭐가 재미있어?"로 시작하는 대화 20분',who:'배우자와 먼저 합의하고 부모도 같은 규칙을 지키기',signal:'4주 뒤 저녁 대화 시간(주당)과 실랑이 횟수. 사용 시간은 6주 뒤에 보기(지연)',review:'11월 28일'},
+ {domain:'학교',title:'행정 업무에 밀려 수업 준비 시간이 계속 줄어든다',situation:'공문과 보고가 늘어 수업 준비는 퇴근 후나 주말에 한다. 수업이 급하게 준비되고 학생 반응이 떨어진다.',desired:'근무 시간 안에 수업 연구를 하고, 동료와 수업을 함께 설계하는 시간이 있다.',duration:'여러 해',tried:'업무 경감 건의 → 양식만 바뀌고 총량은 그대로. 개인적으로 더 일찍 출근 → 소진.',
+  events:'이번 주 보고 자료 3건을 만드느라 물리 실험 수업을 강의로 대체했다.',botLabel:'주당 수업 준비 시간',shape:'down',pattern:'3년에 걸쳐 완만하게 줄었고, 민원이 있던 학기에는 급격히 줄었다.',structure:'학생 참여가 떨어지면 민원이 늘고, 민원은 관리자의 보고 요구를 늘려 행정 업무가 다시 늘어난다.',mental:'"교사는 시키는 일을 다 해내야 한다", "수업 준비는 개인 시간에 하는 것이다"',
+  vars:['행정 업무량*','수업 준비 시간','수업의 질','학생 참여','학부모 민원','관리자의 보고 요구','교사 소진'],
+  links:[[0,1,'-',0],[1,2,'+',1],[2,3,'+',0],[3,4,'-',1],[4,5,'+',0],[5,0,'+',0],[0,6,'+',1],[6,2,'-',0],[6,1,'-',0]],
+  arch:'shift',archNote:'민원이 생기면 보고를 늘려 대응(대증)하지만, 그것이 준비 시간을 빼앗아 수업의 질을 떨어뜨리고 민원을 다시 부른다. 근본 대책인 수업 연구 시간 확보는 늘 뒤로 밀린다.',
+  levers:[{t:'v5',k:5,a:'학생 참여 변화를 민원이 아니라 학기 중 수업 나눔 자료로 관리자에게 먼저 보이기',c:[1,1,1]},{t:'v0',k:6,a:'부서 회의에서 보고 1건 추가 시 기존 1건 폐지 규칙 제안',c:[1,0,1]},{t:'v1',k:2,a:'수요일 5~6교시를 공강으로 묶어 수업 연구 시간으로 고정',c:[1,1,0]}],
+  first:'수요일 교과협의회에서 "보고 1건 추가 시 1건 폐지" 안건을 올리기',who:'같은 교과 동료 2명, 교무부장',signal:'한 학기 뒤 주당 수업 준비 시간, 다음 학기 민원 건수',review:'12월 셋째 주'},
+ {domain:'사회',title:'청소년의 SNS 사용 시간이 늘면서 수면이 줄어든다',situation:'학생들이 새벽까지 SNS를 보다 등교해 1교시에 잔다. 규제 논의는 있지만 학교·가정·플랫폼이 서로 책임을 미룬다.',desired:'학생이 밤 11시 이후에는 기기를 내려놓고 7시간 이상 잔다.',duration:'여러 해',tried:'가정의 규제 → 몰래 사용. 학교의 계도 → 효과 미미.',
+  events:'1교시에 학급 세 명이 엎드려 잤고, 전날 새벽 2시까지 메시지를 주고받았다고 했다.',botLabel:'평일 평균 수면 시간',shape:'down',pattern:'학년이 오를수록 줄고, 방학 뒤 개학 직후가 가장 적다.',structure:'피로가 쌓이면 집중력이 떨어지고, 쉬운 도피처인 SNS로 돌아간다. 알림과 추천은 사용을 늘리도록 설계되어 있다. 또래 관계 불안이 사용을 끌어올린다.',mental:'"안 보면 소외된다", "규제는 어차피 통하지 않는다"',
+  vars:['SNS 사용 시간*','수면 시간','다음 날 피로','또래 관계 불안','알림·추천의 양','가정의 규제','학업 집중력'],
+  links:[[0,1,'-',0],[1,2,'-',0],[2,0,'+',0],[2,6,'-',0],[3,0,'+',0],[0,3,'+',1],[4,0,'+',0],[0,4,'+',1],[0,5,'+',1],[5,0,'-',0],[5,3,'+',0]],
+  arch:'commons',archNote:'학생·가정·플랫폼 각자는 합리적으로 움직이지만, 공동 자원인 청소년의 수면과 또래 관계의 여유가 바닥난다.',
+  levers:[{t:'v4',k:6,a:'학급 단위로 밤 11시 이후 알림 끄기를 함께 약속하고 서로 확인하기',c:[1,1,1]},{t:'v1',k:5,a:'학급 수면 시간을 익명으로 모아 매주 함께 보기',c:[1,1,0]},{t:'v3',k:8,a:'"안 보면 소외된다"는 믿음을 학급 토론 주제로 올리기',c:[1,0,1]}],
+  first:'다음 학급회의에서 수면 시간 익명 조사와 11시 알림 끄기 약속을 안건으로 올리기',who:'학급 자치회, 담임, 학부모회',signal:'4주 뒤 평균 수면 시간(익명 조사), 1교시 엎드린 학생 수',review:'11월 넷째 주'}];
+
+let S; const KEY='stw-v1'; let step=0; let loopsCache=[];
+function blank(){ return {domain:'',title:'',situation:'',desired:'',duration:'',tried:'',events:'',botLabel:'',bot:[],pattern:'',structure:'',mental:'',vars:[],links:[],pos:{},arch:'',archNote:'',levers:[],first:'',who:'',signal:'',review:'',sign:'+',loopKind:{},bend:1}; }
+function load(){ try{ const t=localStorage.getItem(KEY); if(t){ S=Object.assign(blank(),JSON.parse(t)); return; } }catch(e){} S=blank(); }
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
+function uid(){ return 'v'+Math.random().toString(36).slice(2,8); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),1800); }
+const vname=id=>{ const v=S.vars.find(x=>x.id===id); return v?v.name:'?'; };
+const coreVar=()=>S.vars.find(v=>v.core);
+
+/* ---------- 단계 이동 ---------- */
+function stepDone(i){
+ switch(i){case 0:return !!S.title;case 1:return !!(S.pattern||S.structure||S.bot.length);case 2:return S.vars.length>=2;case 3:return S.links.length>=1;case 4:return !!S.arch;case 5:return S.levers.length>=1;case 6:return !!S.first;} }
+function renderNav(){ const n=$('#stepNav'); n.innerHTML=STEPS.map((s,i)=>`<button type="button" data-i="${i}" class="${i===step?'active':''} ${stepDone(i)?'done':''}"><b>${i+1}</b><span>${s}</span></button>`).join('');
+ $('#btnPrev').disabled=step===0; $('#btnNext').textContent= step===6?'완료 ✓':'다음 →'; }
+function go(i){ step=Math.max(0,Math.min(6,i)); $$('section.step').forEach(s=>s.hidden=+s.dataset.step!==step); renderNav(); renderStep(); window.scrollTo({top:0,behavior:'smooth'}); }
+$('#stepNav').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) go(+b.dataset.i); });
+$('#btnPrev').onclick=()=>go(step-1); $('#btnNext').onclick=()=>{ if(step===6){ toast('수고하셨습니다. 요약을 복사해 두세요.'); } else go(step+1); };
+
+/* ---------- 텍스트 필드 바인딩 ---------- */
+const FIELDS=['title','situation','desired','duration','tried','events','botLabel','pattern','structure','mental','archNote','first','who','signal','review'];
+FIELDS.forEach(f=>{ const el=$('#f_'+f); el.addEventListener('input',()=>{ S[f]=el.value; save(); renderNav(); if(step===6) renderReport(); }); });
+$('#domainRadios').addEventListener('change',e=>{ S.domain=e.target.value; save(); renderChips(); });
+function fillFields(){ FIELDS.forEach(f=>{ $('#f_'+f).value=S[f]||''; }); $$('#domainRadios input').forEach(r=>r.checked=r.value===S.domain); }
+
+/* ---------- BOT 그래프 ---------- */
+const BOT={w:520,h:220,l:46,r:16,t:16,b:34};
+function botShape(k){ const n=12, pts=[]; for(let i=0;i<n;i++){ const x=i/(n-1); let y=.5;
+ if(k==='up') y=.15+.7*x; else if(k==='down') y=.85-.7*x; else if(k==='osc') y=.5+.3*Math.sin(x*Math.PI*3);
+ else if(k==='boom') y= x<.55? .15+.75*(x/.55) : .9-.7*((x-.55)/.45); else if(k==='saw') y=.35+.45*((i%4)/3)+ .15*x;
+ else if(k==='plateau') y= x<.5? .15+.6*(x/.5) : .75+.05*Math.sin(x*20);
+ pts.push({t:x,v:Math.max(.05,Math.min(.95,y))}); } return pts; }
+function drawBOT(){ const s=$('#botSvg'); const {w,h,l,r,t,b}=BOT; const X=x=>l+x*(w-l-r), Y=y=>h-b-y*(h-t-b);
+ let g=`<rect x="0" y="0" width="${w}" height="${h}" fill="transparent"/>`;
+ for(let i=0;i<=4;i++){ const y=Y(i/4); g+=`<line x1="${l}" x2="${w-r}" y1="${y}" y2="${y}" stroke="var(--line2)" stroke-width="1"/>`; }
+ g+=`<line x1="${l}" x2="${l}" y1="${Y(0)}" y2="${Y(1)}" stroke="var(--muted)" stroke-width="1.5"/><line x1="${l}" x2="${w-r}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--muted)" stroke-width="1.5"/>`;
+ g+=`<text x="${l-8}" y="${Y(1)+4}" text-anchor="end" font-size="11" fill="var(--muted)">높음</text><text x="${l-8}" y="${Y(0)+4}" text-anchor="end" font-size="11" fill="var(--muted)">낮음</text>`;
+ g+=`<text x="${X(0)}" y="${h-12}" font-size="11" fill="var(--muted)">과거</text><text x="${X(1)}" y="${h-12}" text-anchor="end" font-size="11" fill="var(--muted)">지금</text>`;
+ g+=`<text x="${(l+w-r)/2}" y="${h-12}" text-anchor="middle" font-size="11" fill="var(--muted)">시간 →</text>`;
+ const label=S.botLabel||'변수'; g+=`<text x="${l+6}" y="${t+6}" font-size="12" font-weight="600" fill="var(--fg)">${esc(label)}</text>`;
+ const p=S.bot.slice().sort((a,c)=>a.t-c.t);
+ if(p.length>1) g+=`<polyline fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" points="${p.map(q=>X(q.t)+','+Y(q.v)).join(' ')}"/>`;
+ p.forEach(q=>{ g+=`<circle cx="${X(q.t)}" cy="${Y(q.v)}" r="4" fill="var(--accent)"/>`; });
+ if(!p.length) g+=`<text x="${(l+w-r)/2}" y="${h/2}" text-anchor="middle" font-size="12" fill="var(--muted)">눌러서 점을 찍어 보세요</text>`;
+ s.innerHTML=g; }
+$('#botSvg').addEventListener('pointerdown',e=>{ const s=e.currentTarget; const pt=svgPoint(s,e); const {w,h,l,r,t,b}=BOT; const x=(pt.x-l)/(w-l-r), y=(h-b-pt.y)/(h-t-b); if(x<0||x>1||y<0||y>1) return;
+ S.bot.push({t:+x.toFixed(3),v:+y.toFixed(3)}); save(); drawBOT(); renderNav(); });
+$$('.presets .chip').forEach(c=>c.addEventListener('click',()=>{ const k=c.dataset.shape; S.bot= k==='clear'?[]:botShape(k); save(); drawBOT(); renderNav(); }));
+function svgPoint(svg,e){ const p=svg.createSVGPoint(); p.x=e.clientX; p.y=e.clientY; return p.matrixTransform(svg.getScreenCTM().inverse()); }
+
+/* ---------- 변수 ---------- */
+function addVar(name){ name=name.trim(); if(!name) return; if(S.vars.some(v=>v.name===name)){ toast('이미 있는 변수입니다'); return; } S.vars.push({id:uid(),name,core:S.vars.length===0}); save(); renderVars(); renderNav(); }
+function renderVars(){ const ul=$('#varList'); ul.innerHTML= S.vars.length? S.vars.map(v=>`<li class="${v.core?'core':''}" data-id="${v.id}"><button class="star" title="핵심 변수로 표시" data-act="core">${v.core?'★':'☆'}</button><span class="nm">${esc(v.name)}</span><button class="x" data-act="del" title="삭제">✕</button></li>`).join('') : '<li class="empty" style="border:0;background:transparent">아직 변수가 없습니다. 아래에서 추가하거나 오른쪽 예시를 눌러 보세요.</li>';
+ renderChips(); }
+$('#varList').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const id=b.closest('li').dataset.id;
+ if(b.dataset.act==='core'){ S.vars.forEach(v=>v.core=v.id===id); } else { S.vars=S.vars.filter(v=>v.id!==id); S.links=S.links.filter(l=>l.from!==id&&l.to!==id); S.levers=S.levers.filter(l=>l.t!==id); delete S.pos[id]; }
+ save(); renderVars(); renderNav(); });
+$('#btnAddVar').onclick=()=>{ addVar($('#varInput').value); $('#varInput').value=''; $('#varInput').focus(); };
+$('#varInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('#btnAddVar').click(); } });
+function renderChips(){ const list=DOMAIN_VARS[S.domain]||[...new Set(Object.values(DOMAIN_VARS).flat())].slice(0,10);
+ $('#varChips').innerHTML=list.filter(n=>!S.vars.some(v=>v.name===n)).map(n=>`<button type="button" class="chip">${esc(n)}</button>`).join('')||'<span class="hint">예시를 모두 추가했습니다.</span>'; }
+$('#varChips').addEventListener('click',e=>{ const c=e.target.closest('.chip'); if(c) addVar(c.textContent); });
+
+/* ---------- 인과지도 ---------- */
+const CW=720,CH=460;
+function autoLayout(){ const n=S.vars.length; S.vars.forEach((v,i)=>{ const a=-Math.PI/2+i*2*Math.PI/n; S.pos[v.id]={x:Math.round(CW/2+Math.cos(a)*(CW/2-110)),y:Math.round(CH/2+Math.sin(a)*(CH/2-60))}; }); }
+function ensurePos(){ let need=false; S.vars.forEach(v=>{ if(!S.pos[v.id]) need=true; }); if(need) autoLayout(); }
+$('#btnAutoLayout').onclick=()=>{ autoLayout(); save(); drawCLD($('#cldSvg'),true); };
+$('#bendRange').addEventListener('input',e=>{ S.bend=+e.target.value; save(); drawCLD($('#cldSvg'),true); });
+function findLoops(){ const ids=S.vars.map(v=>v.id), idx={}; ids.forEach((id,i)=>idx[id]=i); const adj=ids.map(()=>[]);
+ S.links.forEach(l=>{ if(idx[l.from]!=null&&idx[l.to]!=null) adj[idx[l.from]].push({to:idx[l.to],l}); });
+ const loops=[], n=ids.length;
+ for(let s=0;s<n&&loops.length<40;s++){ const stack=[s], on=new Set([s]), edges=[];
+  (function dfs(u){ if(loops.length>=40) return; for(const e of adj[u]){ const v=e.to; if(v<s) continue;
+   if(v===s) loops.push({nodes:stack.map(i=>ids[i]),edges:[...edges,e.l]});
+   else if(!on.has(v)&&stack.length<9){ stack.push(v); on.add(v); edges.push(e.l); dfs(v); stack.pop(); on.delete(v); edges.pop(); } } })(s); }
+ let r=0,b=0; loops.forEach(lp=>{ const neg=lp.edges.filter(e=>e.sign==='-').length; lp.type= neg%2===0?'R':'B'; lp.delay=lp.edges.some(e=>e.delay); lp.label=lp.type+(lp.type==='R'?++r:++b); lp.key=[...lp.nodes].sort().join('>'); lp.kind= lp.type==='B'?'B':((S.loopKind||{})[lp.key]||'vicious'); });
+ loops.sort((a,c)=>a.nodes.length-c.nodes.length); return loops; }
+function nodeBox(name){ return {w:Math.max(76,Math.min(190,name.length*14+26)),h:36}; }
+function hit(c,box,dir){ const dx=dir.x,dy=dir.y; const tx=dx?box.w/2/Math.abs(dx):1e9, ty=dy?box.h/2/Math.abs(dy):1e9; const t=Math.min(tx,ty); return {x:c.x+dx*t,y:c.y+dy*t}; }
+let focusKeys=new Set();
+function cssColor(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim()||'#888888'; }
+function hexToRgb(h){ h=h.replace('#',''); if(h.length===3) h=h.split('').map(c=>c+c).join(''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
+function mixColors(list){ if(!list.length) return cssColor('--muted'); const rgb=list.map(hexToRgb); const m=[0,1,2].map(i=>Math.round(rgb.reduce((a,c)=>a+c[i],0)/rgb.length)); return '#'+m.map(v=>v.toString(16).padStart(2,'0')).join(''); }
+function loopColor(lp){ return lp.type==='B'? cssColor('--g') : (lp.kind==='virtuous'? cssColor('--b') : cssColor('--r')); }
+function drawCLD(svg,interactive,mode){ ensurePos(); const report= mode==='report';
+ const pal={r:cssColor('--r'),b:cssColor('--b'),g:cssColor('--g')};
+ const edgeLoops={}; loopsCache.forEach(lp=>{ lp.edges.forEach(e=>{ const k=e.from+'|'+e.to; (edgeLoops[k]=edgeLoops[k]||[]).push(lp); }); });
+ const anyFocus= !report && focusKeys.size>0; const centroids={}; loopsCache.forEach(lp=>{ const pts=lp.nodes.map(id=>S.pos[id]).filter(Boolean); if(pts.length) centroids[lp.key]=loopGeom(pts); });
+ const markers={}; const markerFor=col=>{ const id='mk'+col.replace('#',''); markers[id]=col; return 'url(#'+id+')'; };
+ let edges='', nodes='', labels='';
+ const pair={}; S.links.forEach(l=>{ pair[l.to+'|'+l.from]=true; });
+ S.links.forEach(l=>{ const a=S.pos[l.from], c=S.pos[l.to]; if(!a||!c) return; const ba=nodeBox(vname(l.from)), bc=nodeBox(vname(l.to));
+  const lps=edgeLoops[l.from+'|'+l.to]||[]; const ctrl=bendFor(a,c,lps,centroids,pair[l.from+'|'+l.to],0.12, S.bend||1, (typeof l.bend==='number')?l.bend:null); ctrl.x=Math.max(12,Math.min(CW-12,ctrl.x)); ctrl.y=Math.max(12,Math.min(CH-12,ctrl.y));
+  const d1=norm(ctrl.x-a.x,ctrl.y-a.y), d2=norm(ctrl.x-c.x,ctrl.y-c.y); const P0=hit(a,ba,d1), P2=hit(c,bc,d2); const kinds=[...new Set(lps.map(loopColor))]; const col= kinds.length? mixColors(kinds) : cssColor('--muted');
+  const inFocus= lps.some(lp=>focusKeys.has(lp.key)); const op= report? 1 : (anyFocus? (inFocus?1:0.12) : (lps.length?0.4:0.3)); const sw= inFocus?3:2;
+  const signCol= l.sign==='+'?pal.r:pal.b;
+  edges+=`<g opacity="${op}"><path d="M${P0.x} ${P0.y} Q${ctrl.x} ${ctrl.y} ${P2.x} ${P2.y}" fill="none" stroke="${col}" stroke-width="${sw}" marker-end="${markerFor(col)}"/>`;
+  const q=t=>({x:(1-t)*(1-t)*P0.x+2*(1-t)*t*ctrl.x+t*t*P2.x,y:(1-t)*(1-t)*P0.y+2*(1-t)*t*ctrl.y+t*t*P2.y});
+  const sp=q(.84); const tg=norm(2*(1-.84)*(ctrl.x-P0.x)+2*.84*(P2.x-ctrl.x),2*(1-.84)*(ctrl.y-P0.y)+2*.84*(P2.y-ctrl.y));
+  edges+=`<text x="${sp.x-tg.y*11}" y="${sp.y+tg.x*11+6}" text-anchor="middle" font-size="18" font-weight="800" fill="${signCol}" stroke="var(--panel)" stroke-width="4" paint-order="stroke" style="paint-order:stroke">${l.sign==='+'?'+':'−'}</text>`;
+  if(l.delay){ const m=q(.64); const tm=norm(2*(1-.64)*(ctrl.x-P0.x)+2*.64*(P2.x-ctrl.x),2*(1-.64)*(ctrl.y-P0.y)+2*.64*(P2.y-ctrl.y)); for(const o of[-3,3]){ edges+=`<line x1="${m.x+tm.x*o-tm.y*7}" y1="${m.y+tm.y*o+tm.x*7}" x2="${m.x+tm.x*o+tm.y*7}" y2="${m.y+tm.y*o-tm.x*7}" stroke="${col}" stroke-width="2"/>`; } }
+  edges+='</g>';
+  if(interactive && !report){ const h=q(.5); const li=S.links.indexOf(l); edges+=`<g class="bendh" data-i="${li}" style="cursor:ns-resize"><circle cx="${h.x}" cy="${h.y}" r="9" fill="transparent"/><circle cx="${h.x}" cy="${h.y}" r="4.5" fill="var(--panel)" stroke="${col}" stroke-width="1.5" opacity="${(typeof l.bend==='number')?1:0.55}"/></g>`; }
+ });
+ S.vars.forEach(v=>{ const p=S.pos[v.id]; const b=nodeBox(v.name); const inF= !anyFocus || loopsCache.some(lp=>focusKeys.has(lp.key)&&lp.nodes.includes(v.id)); nodes+=`<g class="node" data-id="${v.id}" opacity="${inF?1:0.35}" style="cursor:${interactive?'grab':'default'}"><rect x="${p.x-b.w/2}" y="${p.y-b.h/2}" width="${b.w}" height="${b.h}" rx="8" fill="${v.core?'var(--accent-soft)':'var(--panel)'}" stroke="${v.core?'var(--accent)':'var(--line)'}" stroke-width="${v.core?2:1.5}"/><text x="${p.x}" y="${p.y+5}" text-anchor="middle" font-size="13" font-weight="${v.core?700:500}" fill="var(--fg)">${esc(v.name)}</text></g>`; });
+ const placed=[]; const loopCols=new Set();
+ loopsCache.forEach((lp,i)=>{ const g=centroids[lp.key]; if(!g) return; let cx=g.cx, cy=g.cy; while(placed.some(q=>Math.hypot(q.x-cx,q.y-cy)<36)) cx+=38; placed.push({x:cx,y:cy}); const col=loopColor(lp); loopCols.add(col); const on=focusKeys.has(lp.key);
+  labels+=`<g class="looplab" data-key="${lp.key}" style="cursor:${interactive?'pointer':'default'}" opacity="${(anyFocus&&!on)?0.35:1}">${loopArc(cx,cy,15,g.cw,col,lp.label,12)}</g>`; });
+ const defs='<defs>'+loopMarkerDefs([...loopCols],4)+Object.entries(markers).map(([id,col])=>`<marker id="${id}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${col}"/></marker>`).join('')+'</defs>';
+ svg.innerHTML= defs+`<rect width="${CW}" height="${CH}" fill="var(--panel)"/>`+ (S.vars.length? edges+labels+nodes : `<text x="${CW/2}" y="${CH/2}" text-anchor="middle" font-size="14" fill="var(--muted)">먼저 변수를 추가하면 여기에 그려집니다</text>`); }
+function loopGeom(pts){ let a=0; for(let i=0;i<pts.length;i++){ const p=pts[i],q=pts[(i+1)%pts.length]; a+=p.x*q.y-q.x*p.y; } const cx=pts.reduce((s,p)=>s+p.x,0)/pts.length, cy=pts.reduce((s,p)=>s+p.y,0)/pts.length; const R=pts.reduce((s,p)=>s+Math.hypot(p.x-cx,p.y-cy),0)/pts.length; return {cx,cy,cw:a>0,n:pts.length,R}; }
+function loopArc(cx,cy,r,cw,col,label,fs,fillText){ const th0=-Math.PI/2, th1=th0+(cw?1:-1)*1.5*Math.PI; const x0=cx+r*Math.cos(th0), y0=cy+r*Math.sin(th0), x1=cx+r*Math.cos(th1), y1=cy+r*Math.sin(th1); const id='la'+col.replace('#','');
+ return `<circle cx="${cx}" cy="${cy}" r="${r+5}" fill="var(--panel)" opacity=".85"/><path d="M${x0} ${y0} A${r} ${r} 0 1 ${cw?1:0} ${x1} ${y1}" fill="none" stroke="${col}" stroke-width="${r>12?2.2:1.6}" marker-end="url(#${id})"/><text x="${cx}" y="${cy+fs*0.36}" text-anchor="middle" font-size="${fs}" font-weight="700" fill="${fillText||col}">${label}</text>`; }
+function loopMarkerDefs(cols,size){ return cols.map(col=>`<marker id="la${col.replace('#','')}" viewBox="0 0 10 10" refX="0" refY="5" markerWidth="${size}" markerHeight="${size}" orient="auto"><path d="M0 0L10 5L0 10z" fill="${col}"/></marker>`).join(''); }
+function bendFor(a,c,lps,centroids,pairBack,base,strength,override){ strength=strength||1; const dx=c.x-a.x, dy=c.y-a.y, d=Math.hypot(dx,dy)||1; let nx=-dy/d, ny=dx/d; let k=base*d, sign=1;
+ if(lps.length){ const cen=centroids[lps[0].key]; const mx=(a.x+c.x)/2-cen.cx, my=(a.y+c.y)/2-cen.cy; const dot=nx*mx+ny*my; if(Math.hypot(mx,my)>4) sign= dot>=0?1:-1; else sign=-1;
+  const n=Math.max(2,cen.n||3); const circ=2*(cen.R||d/2)*(1-Math.cos(Math.PI/n)); k=Math.max(0.12*d, Math.min(1.1*d, n===2? circ*(strength>=1&&centroids.__mini?0.85:0.65) : circ)); }
+ else if(pairBack) k=0.22*d;
+ k*=strength; if(override!=null){ return {x:(a.x+c.x)/2+nx*override, y:(a.y+c.y)/2+ny*override}; }
+ return {x:(a.x+c.x)/2+nx*k*sign, y:(a.y+c.y)/2+ny*k*sign}; }
+function toggleFocus(key){ if(focusKeys.has(key)) focusKeys.delete(key); else focusKeys.add(key); renderCLDStep(); }
+function norm(x,y){ const d=Math.hypot(x,y)||1; return {x:x/d,y:y/d}; }
+(function drag(){ const svg=$('#cldSvg'); let cur=null,off=null,bendCur=null;
+ svg.addEventListener('dblclick',e=>{ const h=e.target.closest('.bendh'); if(!h) return; delete S.links[+h.dataset.i].bend; save(); drawCLD(svg,true); });
+ svg.addEventListener('pointerdown',e=>{ const h=e.target.closest('.bendh'); if(!h) return; bendCur=+h.dataset.i; svg.setPointerCapture(e.pointerId); e.preventDefault(); });
+ svg.addEventListener('pointermove',e=>{ if(bendCur==null) return; const l=S.links[bendCur]; const a=S.pos[l.from], c=S.pos[l.to]; if(!a||!c) return; const p=svgPoint(svg,e); const dx=c.x-a.x, dy=c.y-a.y, d=Math.hypot(dx,dy)||1; const nx=-dy/d, ny=dx/d; const mx=(a.x+c.x)/2, my=(a.y+c.y)/2; const t=(p.x-mx)*nx+(p.y-my)*ny; l.bend=Math.round(Math.max(-1.6*d,Math.min(1.6*d, 2*t))); drawCLD(svg,true); });
+ svg.addEventListener('pointerup',()=>{ if(bendCur!=null){ bendCur=null; save(); } });
+ svg.addEventListener('click',e=>{ const lab=e.target.closest('.looplab'); if(lab) toggleFocus(lab.dataset.key); });
+ svg.addEventListener('pointerdown',e=>{ const g=e.target.closest('.node'); if(!g) return; cur=g.dataset.id; const p=svgPoint(svg,e); off={x:S.pos[cur].x-p.x,y:S.pos[cur].y-p.y}; svg.setPointerCapture(e.pointerId); });
+ svg.addEventListener('pointermove',e=>{ if(!cur) return; const p=svgPoint(svg,e); S.pos[cur]={x:Math.round(Math.max(60,Math.min(CW-60,p.x+off.x))),y:Math.round(Math.max(24,Math.min(CH-24,p.y+off.y)))}; drawCLD(svg,true); });
+ const up=()=>{ if(cur){ cur=null; save(); } }; svg.addEventListener('pointerup',up); svg.addEventListener('pointercancel',up); })();
+$('#signPos').onclick=()=>setSign('+'); $('#signNeg').onclick=()=>setSign('-');
+function setSign(s){ S.sign=s; $('#signPos').classList.toggle('on',s==='+'); $('#signNeg').classList.toggle('on',s==='-'); }
+$('#btnAddLink').onclick=()=>{ const f=$('#linkFrom').value,t=$('#linkTo').value; if(!f||!t) return; if(f===t){ toast('원인과 결과가 같을 수 없습니다'); return; }
+ if(S.links.some(l=>l.from===f&&l.to===t)){ toast('이미 있는 화살표입니다'); return; } S.links.push({from:f,to:t,sign:S.sign||'+',delay:$('#linkDelay').checked}); $('#linkDelay').checked=false; save(); renderCLDStep(); renderNav(); };
+$('#linkList').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const i=+b.dataset.i; if(b.dataset.act==='del') S.links.splice(i,1); else if(b.dataset.act==='flip') S.links[i].sign= S.links[i].sign==='+'?'-':'+'; save(); renderCLDStep(); renderNav(); });
+function loopMeaning(lp){ const core=coreVar(); const hasCore=core&&lp.nodes.includes(core.id);
+ if(lp.type==='R') return (hasCore?`핵심 변수를 지나는 강화 고리입니다. `:'')+`한 바퀴 돌 때마다 변화가 커지는 눈덩이 구조입니다. 지금 ${lp.kind==='virtuous'?'선순환':'악순환'}으로 돌고 있다고 표시했습니다(아래에서 바꿀 수 있어요).`+(lp.delay?' 지연이 있어 효과를 늦게 알아차립니다.':'');
+ return (hasCore?`핵심 변수를 지나는 균형 고리입니다. `:'')+`변화를 되돌려 어떤 수준으로 맞추려는 구조입니다. 그 목표가 무엇인지 물어보세요.`+(lp.delay?' 지연이 있어 과잉 반응과 진동이 생기기 쉽습니다.':''); }
+function renderCLDStep(){ const opts=S.vars.map(v=>`<option value="${v.id}">${esc(v.name)}</option>`).join('');
+ const f=$('#linkFrom'),t=$('#linkTo'); const fv=f.value,tv=t.value; f.innerHTML=opts; t.innerHTML=opts; if(S.vars.some(v=>v.id===fv)) f.value=fv; if(S.vars.some(v=>v.id===tv)) t.value=tv; else if(S.vars.length>1) t.value=S.vars[1].id;
+ setSign(S.sign||'+'); $('#bendRange').value=S.bend||1; loopsCache=findLoops(); drawCLD($('#cldSvg'),true);
+ $('#linkList').innerHTML=S.links.map((l,i)=>`<li><span class="t">${esc(vname(l.from))} → ${esc(vname(l.to))}${l.delay?' <span class="hint">∥지연</span>':''}</span><button class="pill ${l.sign==='+'?'pos':'neg'}" style="border:0;cursor:pointer" data-act="flip" data-i="${i}" title="부호 바꾸기">${l.sign==='+'?'+':'−'}</button><button class="x" data-act="del" data-i="${i}">✕</button></li>`).join('');
+ $('#loopList').innerHTML= loopsCache.length? loopsCache.map(lp=>`<div class="loop ${lp.type} ${lp.kind} ${focusKeys.has(lp.key)?'focus':''}" data-key="${lp.key}" role="button" tabindex="0" title="누르면 이 고리만 선명하게 보입니다"><div class="lab">${lp.label}</div><div><div class="path">${lp.nodes.map(vname).map(esc).join(' → ')} → ${esc(vname(lp.nodes[0]))}</div><div class="meaning">${loopMeaning(lp)}</div>${lp.type==='R'?`<div class="kind"><button type="button" data-kind="vicious" class="v ${lp.kind==='vicious'?'on':''}">악순환</button><button type="button" data-kind="virtuous" class="p ${lp.kind==='virtuous'?'on':''}">선순환</button></div>`:''}</div></div>`).join('')
+  : (S.links.length? '<p class="empty">아직 닫힌 고리가 없습니다. 결과가 다시 원인에 영향을 주는 화살표를 찾아보세요. 문제가 반복된다면 어딘가에 고리가 있습니다.</p>':''); }
+
+$('#loopList').addEventListener('click',e=>{ const card=e.target.closest('.loop'); if(!card) return; const kb=e.target.closest('button[data-kind]'); if(kb){ S.loopKind=S.loopKind||{}; S.loopKind[card.dataset.key]=kb.dataset.kind; save(); renderCLDStep(); return; } toggleFocus(card.dataset.key); });
+$('#loopList').addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ const card=e.target.closest('.loop'); if(card&&e.target===card){ e.preventDefault(); toggleFocus(card.dataset.key); } } });
+
+
+/* ---------- 원형 미니 인과지도 ---------- */
+const MINI={
+ fix:{n:[{i:'s',l:'문제 증상',x:.22,y:.3},{i:'f',l:'미봉책(증상 처방)',x:.74,y:.3},{i:'u',l:'의도치 않은 결과',x:.5,y:.84}],e:[['s','f','+'],['f','s','-'],['f','u','+',1],['u','s','+']]},
+ shift:{n:[{i:'y',l:'외부 개입(대증 처방)',x:.3,y:.14},{i:'s',l:'문제 증상',x:.3,y:.5},{i:'f',l:'내부 해결(근본 해결)',x:.3,y:.86},{i:'e',l:'외부 개입 의존',x:.8,y:.5}],e:[['s','y','+'],['y','s','-'],['s','f','+',1],['f','s','-'],['y','e','+'],['e','f','-']]},
+ limits:{n:[{i:'e',l:'노력',x:.16,y:.56},{i:'p',l:'성과',x:.5,y:.56},{i:'a',l:'제약 행동',x:.84,y:.56},{i:'c',l:'제약 조건',x:.84,y:.14}],e:[['e','p','+'],['p','e','+'],['p','a','+'],['a','p','-'],['c','a','+']]},
+ erode:{n:[{i:'g',l:'목표',x:.24,y:.14},{i:'p',l:'목표 낮추기 압력',x:.76,y:.14},{i:'k',l:'격차',x:.5,y:.5},{i:'r',l:'현실',x:.24,y:.86},{i:'a',l:'교정 행동',x:.76,y:.86}],e:[['g','k','+'],['k','p','+'],['p','g','-'],['k','a','+',1],['a','r','+'],['r','k','-']]},
+ escal:{n:[{i:'a',l:'A의 활동',x:.1,y:.5},{i:'ra',l:'A의 성과',x:.3,y:.14},{i:'ta',l:'A가 느끼는 위협',x:.3,y:.86},{i:'q',l:'A의 상대적 우위',x:.5,y:.5},{i:'rb',l:'B의 성과',x:.7,y:.14},{i:'tb',l:'B가 느끼는 위협',x:.7,y:.86},{i:'b',l:'B의 활동',x:.9,y:.5}],e:[['a','ra','+'],['ra','q','+'],['q','ta','-'],['ta','a','+'],['q','tb','+'],['tb','b','+'],['b','rb','+'],['rb','q','-']]},
+ success:{n:[{i:'sa',l:'A의 성공',x:.2,y:.18},{i:'ra',l:'A에게 자원',x:.2,y:.82},{i:'al',l:'B 대신 A에게 배분',x:.5,y:.5},{i:'sb',l:'B의 성공',x:.8,y:.18},{i:'rb',l:'B에게 자원',x:.8,y:.82}],e:[['ra','sa','+'],['sa','al','+'],['al','ra','+'],['al','rb','-'],['rb','sb','+'],['sb','al','-']]},
+ commons:{n:[{i:'ga',l:'A의 순이익',x:.2,y:.1},{i:'a',l:'A의 활동',x:.2,y:.38},{i:'t',l:'총 활동',x:.46,y:.5},{i:'u',l:'활동당 이득',x:.72,y:.5},{i:'lim',l:'자원 한계',x:.9,y:.2},{i:'b',l:'B의 활동',x:.2,y:.62},{i:'gb',l:'B의 순이익',x:.2,y:.9}],e:[['a','ga','+'],['ga','a','+'],['b','gb','+'],['gb','b','+'],['a','t','+'],['b','t','+'],['t','u','-',1],['u','ga','+'],['u','gb','+'],['lim','u','+']]},
+ under:{n:[{i:'g',l:'성장 노력',x:.14,y:.3},{i:'d',l:'수요',x:.42,y:.12},{i:'p',l:'성과',x:.46,y:.5},{i:'st',l:'성과 기준',x:.88,y:.3},{i:'n',l:'투자 필요 인식',x:.8,y:.62},{i:'inv',l:'역량 투자',x:.6,y:.9},{i:'c',l:'역량',x:.26,y:.82}],e:[['g','d','+'],['d','g','+'],['d','p','-'],['p','g','+'],['p','n','-'],['st','n','+'],['n','inv','+',1],['inv','c','+',1],['c','p','+']]}};
+function miniCLD(spec){ const W=300,H=180; const pal={r:cssColor('--r'),b:cssColor('--b'),g:cssColor('--g')};
+ const box=l=>({w:Math.max(44,l.length*10.5+14),h:22}); const P={}; spec.n.forEach(n=>P[n.i]={x:n.x*W,y:n.y*H,l:n.l});
+ const loopOf={}; spec.e.forEach(e=>{ loopOf[e[0]+'|'+e[1]]=null; });
+ // 각 화살표의 색: 어느 고리에 속하는지 간단 탐색(미니 지도는 작으므로 전수 탐색)
+ const ids=spec.n.map(n=>n.i); const adj={}; ids.forEach(i=>adj[i]=[]); spec.e.forEach(e=>adj[e[0]].push(e));
+ const edgeCols={}; const seen=new Set(); const mloops=[];
+ ids.forEach(s0=>{ const st=[s0],on=new Set([s0]),es=[]; (function dfs(u){ for(const e of adj[u]){ const v=e[1]; if(ids.indexOf(v)<ids.indexOf(s0)) continue; if(v===s0){ const path=[...es,e]; const key=path.map(x=>x[0]+'|'+x[1]).sort().join(','); if(seen.has(key)) continue; seen.add(key); const neg=path.filter(x=>x[2]==='-').length; const col= neg%2? pal.g : pal.r; path.forEach(x=>{ const k=x[0]+'|'+x[1]; (edgeCols[k]=edgeCols[k]||new Set()).add(col); }); mloops.push({key,type:neg%2?'B':'R',nodes:[...st],col}); } else if(!on.has(v)&&st.length<8){ st.push(v); on.add(v); es.push(e); dfs(v); st.pop(); on.delete(v); es.pop(); } } })(s0); });
+ mloops.sort((a,b)=>a.nodes.length-b.nodes.length); let rr=0,bb=0; const centroids={__mini:true}; const edgeLp={}; mloops.forEach(lp=>{ lp.label=lp.type+(lp.type==='R'?++rr:++bb); centroids[lp.key]=loopGeom(lp.nodes.map(i=>P[i])); lp.nodes.forEach((n,i)=>{ const m=lp.nodes[(i+1)%lp.nodes.length]; const k=n+'|'+m; (edgeLp[k]=edgeLp[k]||[]).push(lp); }); });
+ const pair={}; spec.e.forEach(e=>pair[e[1]+'|'+e[0]]=true); const markers={}; let out='';
+ spec.e.forEach(e=>{ const a=P[e[0]],c=P[e[1]]; const ba=box(a.l),bc=box(c.l); const ctrl=bendFor(a,c,edgeLp[e[0]+'|'+e[1]]||[],centroids,pair[e[0]+'|'+e[1]],0.1,1);
+  const P0=hit(a,ba,norm(ctrl.x-a.x,ctrl.y-a.y)), P2=hit(c,bc,norm(ctrl.x-c.x,ctrl.y-c.y)); const cols=[...(edgeCols[e[0]+'|'+e[1]]||[])]; const col= cols.length? mixColors(cols) : cssColor('--muted'); const id='mm'+col.replace('#',''); markers[id]=col;
+  out+=`<path d="M${P0.x} ${P0.y} Q${ctrl.x} ${ctrl.y} ${P2.x} ${P2.y}" fill="none" stroke="${col}" stroke-width="1.6" marker-end="url(#${id})"/>`;
+  const q=t=>({x:(1-t)*(1-t)*P0.x+2*(1-t)*t*ctrl.x+t*t*P2.x,y:(1-t)*(1-t)*P0.y+2*(1-t)*t*ctrl.y+t*t*P2.y}); const sp=q(.8); const tg=norm(2*(1-.8)*(ctrl.x-P0.x)+2*.8*(P2.x-ctrl.x),2*(1-.8)*(ctrl.y-P0.y)+2*.8*(P2.y-ctrl.y));
+  out+=`<text x="${sp.x-tg.y*9}" y="${sp.y+tg.x*9+4.5}" text-anchor="middle" font-size="13" font-weight="800" fill="${e[2]==='+'?pal.r:pal.b}" stroke="var(--panel2)" stroke-width="3" style="paint-order:stroke">${e[2]==='+'?'+':'−'}</text>`;
+  if(e[3]){ const m=q(.55); const tm=norm(ctrl.x-P0.x+P2.x-ctrl.x,ctrl.y-P0.y+P2.y-ctrl.y); for(const o of[-2.5,2.5]) out+=`<line x1="${m.x+tm.x*o-tm.y*5}" y1="${m.y+tm.y*o+tm.x*5}" x2="${m.x+tm.x*o+tm.y*5}" y2="${m.y+tm.y*o-tm.x*5}" stroke="${col}" stroke-width="1.6"/>`; } });
+ spec.n.forEach(n=>{ const p=P[n.i], b=box(n.l); out+=`<rect x="${p.x-b.w/2}" y="${p.y-b.h/2}" width="${b.w}" height="${b.h}" rx="5" fill="var(--panel)" stroke="var(--line)"/><text x="${p.x}" y="${p.y+4}" text-anchor="middle" font-size="10.5" fill="var(--fg)">${esc(n.l)}</text>`; });
+ const placed=[]; mloops.forEach(lp=>{ const g=centroids[lp.key]; let cx=g.cx; while(placed.some(q=>Math.hypot(q.x-cx,q.y-g.cy)<24)) cx+=26; placed.push({x:cx,y:g.cy}); out+=loopArc(cx,g.cy,10,g.cw,lp.col,lp.label,9); });
+ const defs='<defs>'+loopMarkerDefs([pal.r,pal.g],3.4)+Object.entries(markers).map(([id,col])=>`<marker id="${id}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${col}"/></marker>`).join('')+'</defs>';
+ return `<svg class="mini" viewBox="0 0 ${W} ${H}" role="img" aria-label="원형의 인과순환지도">${defs}${out}</svg>`; }
+
+/* ---------- 원형 ---------- */
+function archSuggest(){ const R=loopsCache.filter(l=>l.type==='R').length,B=loopsCache.filter(l=>l.type==='B').length; if(!loopsCache.length) return [];
+ return ARCH.map(a=>({id:a.id,d:Math.abs((a.sig.R||0)-R)+Math.abs((a.sig.B||0)-B)})).sort((x,y)=>x.d-y.d).filter(x=>x.d<=1).slice(0,3).map(x=>x.id); }
+function renderArch(){ loopsCache=findLoops(); const R=loopsCache.filter(l=>l.type==='R').length,B=loopsCache.filter(l=>l.type==='B').length; const sug=archSuggest();
+ $('#archSummary').innerHTML= loopsCache.length? `내 지도에는 강화 고리 <b>${R}</b>개, 균형 고리 <b>${B}</b>개가 있습니다. 고리 구성이 비슷한 원형에 <span class="tag">구조가 닮음</span> 표시를 했습니다. 설명과 신호를 읽고 가장 닮은 것을 고르세요.` : '아직 닫힌 고리가 없어도 설명과 신호를 읽고 가장 닮은 원형을 고를 수 있습니다.';
+ $('#archGrid').innerHTML=ARCH.map(a=>`<div class="acard ${S.arch===a.id?'sel':''} ${sug.includes(a.id)?'sug':''}" data-id="${a.id}" role="button" tabindex="0"><h3>${a.name} ${sug.includes(a.id)?'<span class="tag">구조가 닮음</span>':''}</h3><div class="sig">고리 구성: ${a.sig.R?'R×'+a.sig.R:''} ${a.sig.B?'B×'+a.sig.B:''}</div><p style="font-size:.88rem">${a.structure}</p>${MINI[a.id]?miniCLD(MINI[a.id]):''}<ul>${a.signals.map(s=>`<li>${s}</li>`).join('')}</ul><div class="lv"><b>지렛대 방향</b> ${a.lever}</div></div>`).join(''); }
+$('#archGrid').addEventListener('click',e=>{ const c=e.target.closest('.acard'); if(!c) return; S.arch= S.arch===c.dataset.id?'':c.dataset.id; save(); renderArch(); renderNav(); });
+$('#archGrid').addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ const c=e.target.closest('.acard'); if(c){ e.preventDefault(); c.click(); } } });
+
+/* ---------- 지렛대 ---------- */
+function renderLadder(){ $('#ladder').innerHTML=LEVELS.map(L=>`<div class="rung" style="--p:${L.k/8}"><div class="k">${L.k}</div><div><span class="nm">${L.name}</span> <span style="font-size:.84rem;color:var(--muted)">${L.desc}</span><span class="ex">예: ${L.ex}</span></div><div class="bar" title="효과의 크기"></div></div>`).join(''); }
+function targetName(t){ if(t&&t.startsWith('loop:')){ const lp=loopsCache.find(l=>l.label===t.slice(5)); return lp? lp.label+' 고리' : t.slice(5)+' 고리'; } return vname(t); }
+function leverScore(l){ const c=l.c||[0,0,0]; const chk=c.reduce((a,b)=>a+b,0); const lv=l.k; let msg,cls;
+ if(lv<=2&&chk<2) { msg='낮은 단의 개입이고 점검도 덜 됐습니다. 많은 힘이 들지만 구조는 그대로일 수 있어요.'; cls='warn'; }
+ else if(lv<=2) { msg='빠르게 해 볼 수 있는 개입입니다. 다만 수치만 바꾸면 시스템이 금세 적응합니다. 더 높은 단과 함께 쓰세요.'; cls=''; }
+ else if(lv>=6&&chk===3) { msg='높은 단의 개입이면서 구조·부작용·지연까지 점검했습니다. 작은 힘으로 큰 변화를 기대할 수 있는 지렛대입니다.'; cls='good'; }
+ else if(lv>=6) { msg='높은 단의 개입입니다. 아래 점검 중 비어 있는 항목을 채우면 실패 가능성이 크게 줄어듭니다.'; cls=''; }
+ else { msg= chk===3?'중간 단의 개입으로 구조를 바꿉니다. 꾸준히 하면 고리의 방향이 바뀝니다.':'중간 단의 개입입니다. 부작용과 지연을 한 번 더 생각해 보세요.'; cls= chk===3?'good':''; }
+ return {msg,cls}; }
+function renderLevers(){ loopsCache=findLoops(); const sel=$('#levTarget'); const prev=sel.value;
+ sel.innerHTML=S.vars.map(v=>`<option value="${v.id}">${esc(v.name)}</option>`).join('')+loopsCache.map(l=>`<option value="loop:${l.label}">${l.label} 고리 (${l.nodes.map(vname).map(esc).join('→')})</option>`).join(''); if(prev) sel.value=prev;
+ const ls=$('#levLevel'); if(!ls.options.length) ls.innerHTML=LEVELS.map(L=>`<option value="${L.k}">${L.k}단 · ${L.name}</option>`).join('');
+ const sorted=S.levers.map((l,i)=>({l,i})).sort((a,b)=>b.l.k-a.l.k);
+ $('#leverList').innerHTML= sorted.length? sorted.map(({l,i})=>{ const sc=leverScore(l); const L=LEVELS[l.k-1]; return `<div class="lever" data-i="${i}"><div class="h"><span class="pill" style="background:var(--accent-soft);color:var(--accent)">${l.k}단 ${L.name}</span><b>${esc(l.a)}</b><span class="hint">→ ${esc(targetName(l.t))}</span><button class="x" data-act="del">✕</button></div>
+  <div class="checks"><label><input type="checkbox" data-c="0" ${l.c&&l.c[0]?'checked':''}> 증상이 아니라 구조를 겨냥한다</label><label><input type="checkbox" data-c="1" ${l.c&&l.c[1]?'checked':''}> 다른 고리에 미칠 부작용을 생각했다</label><label><input type="checkbox" data-c="2" ${l.c&&l.c[2]?'checked':''}> 효과가 나타날 때까지의 지연을 안다</label></div>
+  <div class="score ${sc.cls}">${sc.msg}</div></div>`; }).join('') : '<p class="empty">아직 지렛대가 없습니다. 원형의 "지렛대 방향"과 사다리를 보며 하나씩 추가해 보세요.</p>'; }
+$('#btnAddLever').onclick=()=>{ const a=$('#levAction').value.trim(); if(!a){ toast('무엇을 할지 적어 주세요'); $('#levAction').focus(); return; } S.levers.push({t:$('#levTarget').value,k:+$('#levLevel').value,a,c:[0,0,0]}); $('#levAction').value=''; save(); renderLevers(); renderNav(); };
+$('#leverList').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const i=+b.closest('.lever').dataset.i; S.levers.splice(i,1); save(); renderLevers(); renderNav(); });
+$('#leverList').addEventListener('change',e=>{ const cb=e.target; if(cb.type!=='checkbox') return; const i=+cb.closest('.lever').dataset.i; const l=S.levers[i]; l.c=l.c||[0,0,0]; l.c[+cb.dataset.c]=cb.checked?1:0; save(); renderLevers(); });
+
+/* ---------- 요약 ---------- */
+function reportText(){ const a=ARCH.find(x=>x.id===S.arch); const L=[]; L.push(`[${S.domain||'영역 미정'}] ${S.title||'(제목 없음)'}`,'');
+ L.push('■ 문제',`지금: ${S.situation}`,`바라는 상태: ${S.desired}`,`기간: ${S.duration}`,`해 본 것: ${S.tried}`,'');
+ L.push('■ 빙산',`사건: ${S.events}`,`패턴(${S.botLabel}): ${S.pattern}`,`구조: ${S.structure}`,`마음의 모델: ${S.mental}`,'');
+ L.push('■ 변수',S.vars.map(v=>(v.core?'★ ':'· ')+v.name).join('\n'),'');
+ L.push('■ 인과 관계',S.links.map(l=>`${vname(l.from)} → ${vname(l.to)} (${l.sign})${l.delay?' 지연':''}`).join('\n'),'');
+ L.push('■ 피드백 고리',loopsCache.map(lp=>`${lp.label}: ${lp.nodes.map(vname).join(' → ')} → ${vname(lp.nodes[0])}`).join('\n')||'(없음)','');
+ L.push('■ 시스템 원형',a?`${a.name} — ${S.archNote}`:'(미선택)','');
+ L.push('■ 지렛대',S.levers.slice().sort((x,y)=>y.k-x.k).map(l=>`[${l.k}단 ${LEVELS[l.k-1].name}] ${l.a} → ${targetName(l.t)}`).join('\n')||'(없음)','');
+ L.push('■ 첫 걸음',`이번 주: ${S.first}`,`함께: ${S.who}`,`확인: ${S.signal}`,`점검일: ${S.review}`); return L.join('\n'); }
+function renderReport(){ loopsCache=findLoops(); const a=ARCH.find(x=>x.id===S.arch); const r=$('#report'); const p=s=>s?`<p>${esc(s)}</p>`:'<p class="empty">아직 적지 않았습니다</p>';
+ r.innerHTML=`<div class="eyebrow">${esc(S.domain||'영역')}</div><h2>${esc(S.title||'제목 없는 문제')}</h2><div class="meta">${esc(S.duration?S.duration+'째 반복 · ':'')}변수 ${S.vars.length} · 화살표 ${S.links.length} · 고리 ${loopsCache.length}</div>
+ <h3>바라는 상태</h3>${p(S.desired)}<h3>지금까지 해 본 것</h3>${p(S.tried)}
+ <h3>빙산</h3><ul><li><b>사건</b> ${esc(S.events)||'—'}</li><li><b>패턴</b> ${esc(S.pattern)||'—'}</li><li><b>구조</b> ${esc(S.structure)||'—'}</li><li><b>마음의 모델</b> ${esc(S.mental)||'—'}</li></ul>
+ <h3>인과순환지도</h3><svg id="repSvg" viewBox="0 0 ${CW} ${CH}" role="img" aria-label="인과순환지도 요약"></svg>
+ ${loopsCache.length?`<ul style="margin-top:8px">${loopsCache.map(lp=>`<li><span class="pill ${lp.type}">${lp.label}</span> ${lp.nodes.map(vname).map(esc).join(' → ')} → ${esc(vname(lp.nodes[0]))}</li>`).join('')}</ul>`:''}
+ <h3>시스템 원형</h3>${a?`<p><b>${a.name}</b> · ${esc(S.archNote)}</p><p class="hint">지렛대 방향: ${a.lever}</p>`:'<p class="empty">아직 고르지 않았습니다</p>'}
+ <h3>지렛대 (효과가 큰 순)</h3>${S.levers.length?`<ul>${S.levers.slice().sort((x,y)=>y.k-x.k).map(l=>`<li><b>${l.k}단</b> ${esc(l.a)} <span class="hint">→ ${esc(targetName(l.t))}</span></li>`).join('')}</ul>`:'<p class="empty">아직 없습니다</p>'}
+ <h3>첫 걸음</h3><ul><li><b>이번 주</b> ${esc(S.first)||'—'}</li><li><b>함께</b> ${esc(S.who)||'—'}</li><li><b>확인</b> ${esc(S.signal)||'—'}</li><li><b>점검일</b> ${esc(S.review)||'—'}</li></ul>`;
+ drawCLD($('#repSvg'),false,'report'); }
+$('#btnCopyReport').onclick=()=>copyText(reportText(),'요약을 복사했습니다');
+$('#btnPrint').onclick=()=>{ renderReport(); const embedded= window.self!==window.top; if(embedded) toast('미리보기 화면에서는 인쇄 창이 열리지 않을 수 있습니다. HTML 파일을 브라우저에서 직접 열어 주세요.'); setTimeout(()=>{ try{ window.print(); }catch(e){} },50); };
+function copyText(t,msg){ const done=()=>toast(msg); const fb=()=>{ const ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); done(); }catch(e){ toast('복사가 막혔습니다. 글상자에서 직접 복사하세요'); } ta.remove(); };
+ if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done,fb); else fb(); }
+
+/* ---------- 저장·불러오기·예시·초기화 ---------- */
+$('#btnIO').onclick=()=>{ const p=$('#ioPanel'); p.hidden=!p.hidden; if(!p.hidden) $('#ioText').value=JSON.stringify(S); };
+$('#btnCopyJSON').onclick=()=>copyText(JSON.stringify(S),'기록을 복사했습니다');
+$('#btnApplyJSON').onclick=()=>{ try{ const o=JSON.parse($('#ioText').value); if(!o||!Array.isArray(o.vars)) throw 0; S=Object.assign(blank(),o); save(); renderAll(); toast('불러왔습니다'); }catch(e){ toast('형식을 읽을 수 없습니다'); } };
+let resetArmed=false; $('#btnReset').onclick=()=>{ if(!resetArmed){ resetArmed=true; $('#btnReset').textContent='정말 지울까요? 다시 누르기'; setTimeout(()=>{ resetArmed=false; $('#btnReset').textContent='처음부터'; },3000); return; } resetArmed=false; $('#btnReset').textContent='처음부터'; S=blank(); save(); go(0); renderAll(); toast('새로 시작합니다'); };
+$('#sampleSel').addEventListener('change',e=>{ const i=e.target.value; e.target.value=''; if(i==='') return; loadSample(SAMPLES[+i]); });
+function loadSample(sm){ const s=blank(); ['domain','title','situation','desired','duration','tried','events','botLabel','pattern','structure','mental','archNote','first','who','signal','review'].forEach(k=>s[k]=sm[k]||''); s.bot=botShape(sm.shape);
+ s.vars=sm.vars.map((n,i)=>({id:'v'+i,name:n.replace('*',''),core:n.endsWith('*')})); s.links=sm.links.map(([f,t,sg,d])=>({from:'v'+f,to:'v'+t,sign:sg,delay:!!d})); s.arch=sm.arch; s.levers=sm.levers.map(l=>({t:l.t,k:l.k,a:l.a,c:l.c}));
+ S=s; autoLayout(); save(); go(0); renderAll(); toast('예시를 불러왔습니다. 각 단계를 넘기며 살펴보세요.'); }
+
+/* ---------- 렌더 ---------- */
+function renderStep(){ if(step===1) drawBOT(); if(step===2) renderVars(); if(step===3) renderCLDStep(); if(step===4) renderArch(); if(step===5){ renderLadder(); renderLevers(); } if(step===6) renderReport(); }
+function renderAll(){ fillFields(); renderNav(); renderStep(); }
+load(); go(0); renderAll();
+})();
+</script>
+
+</body></html>
