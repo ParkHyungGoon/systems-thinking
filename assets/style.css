@@ -229,3 +229,11 @@ footer a{color:var(--ink-2)}
 .manual table td:first-child{white-space:normal;min-width:9rem}
 .manual table td:nth-child(2){min-width:18rem}
 .manual table td:nth-child(3){white-space:nowrap}
+
+/* QR */
+.qrbox{display:flex;gap:1.4rem;align-items:center;border:1px solid var(--rule);border-radius:12px;padding:1.1rem 1.4rem;max-width:560px;background:var(--card)}
+.qrbox img{flex:none;width:132px;height:132px;background:#fff;padding:6px;border-radius:8px;border:1px solid var(--rule)}
+.qrbox b{font-family:var(--serif);font-size:1.15rem;display:block;margin-bottom:.3rem}
+.qrbox p{margin:0 0 .3rem;font-size:.95rem;color:var(--ink-2)}
+.qrbox .url{color:var(--plus);font-weight:600}
+@media (max-width:480px){.qrbox{flex-direction:column;align-items:flex-start}}
