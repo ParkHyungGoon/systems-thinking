@@ -12,5 +12,4 @@
 각 `.html` 파일을 메모장이나 VS Code로 열어 글을 고친 뒤 GitHub에 다시 올리면 1~2분 안에 반영됩니다.
 - 새 모임 추가: `activities.html`의 `<ol class="timeline">` 안에 `<li>` 한 덩어리를 복사해 날짜·회차·제목·요약을 바꿉니다. `bar b1/b2/b3/b0`이 읽은 책 색입니다.
 - 유튜브 영상 넣기: `resources.html`의 `<div class="video">…</div>`를 `<div class="video"><iframe src="https://www.youtube.com/embed/영상ID" allowfullscreen></iframe></div>`로 바꿉니다.
-- 가입 신청 폼: `join.html`의 `href="#"`에 폼 주소를 넣습니다.
 - 다음 모임: `index.html`의 `<div class="next">` 안 날짜와 설명을 바꿉니다.
