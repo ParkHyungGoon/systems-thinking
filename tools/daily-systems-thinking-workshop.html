@@ -1,11 +1,18 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>:root{color-scheme:light dark} body{margin:0;font-size:14px} img{max-width:100%} [hidden]{display:none!important}</style>
 <title>일상의 시스템사고 워크숍</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@600;700&display=swap">
+</head>
+<body>
 <style>
-/* 레이아웃: 상단 고정 단계 표시줄 + 한 단계씩 보이는 작업 패널(세로 흐름). 인과지도 단계만 2열. */
+/* 레이아웃: 상단 고정 단계 표시줄 + 한 단계씩 보이는 작업 패널(세로 흐름). 인과순환지도 단계만 2열. */
 :root{
-  --bg:#eef3f1; --panel:#ffffff; --panel2:#f5f8f7; --fg:#182524; --muted:#5a6e6c; --line:#d3dedb; --line2:#e4ebe9;
+  --bg:#fbf7e6; --panel:#fffdf5; --panel2:#f7f2df; --fg:#2a2718; --muted:#6d6752; --line:#e3dcc0; --line2:#ede7cf;
   --accent:#0d6b67; --accent-ink:#ffffff; --accent-soft:#d9eeec;
   --r:#bf4f2b; --r-soft:#f7e3dc; --b:#2b5fae; --b-soft:#dde7f7; --warn:#a6701a; --warn-soft:#f6ead3; --ok:#2f7a4a; --g:#2f7a4a; --g-soft:#dcefe1;
   --display:"Noto Serif KR","Apple SD Gothic Neo",serif; --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
@@ -34,6 +41,11 @@ textarea,input[type=text],select{width:100%;border:1px solid var(--line);backgro
 textarea{resize:vertical;min-height:74px}
 textarea:focus,input:focus,select:focus,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 label.f{display:block;font-weight:600;font-size:.92rem;margin-bottom:5px}
+.mic{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;margin-left:6px;vertical-align:-6px;border:1px solid var(--line);border-radius:50%;background:var(--panel);cursor:pointer;font-size:13px;line-height:1;padding:0;color:var(--muted)}
+.mic:hover{border-color:var(--accent);color:var(--accent)}
+.mic.on{background:#c0392b;border-color:#c0392b;color:#fff;animation:micpulse 1s ease-in-out infinite}
+@keyframes micpulse{50%{box-shadow:0 0 0 6px rgba(192,57,43,.25)}}
+.mic[disabled]{opacity:.35;cursor:not-allowed}
 .hint{color:var(--muted);font-size:.86rem}
 .btn{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:600;white-space:nowrap}
 .btn:hover{border-color:var(--accent)}
@@ -48,18 +60,24 @@ header.top{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-con
 .tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .tools select{width:auto;padding:7px 10px}
 
-nav.steps{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-block:8px 18px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding-block:8px;z-index:5}
-nav.steps button{border:0;background:transparent;border-top:3px solid var(--line);padding:8px 4px 2px;text-align:left;cursor:pointer;color:var(--muted);font-size:.8rem;line-height:1.3;min-width:0}
+nav.steps{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-block:8px 18px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);padding-block:8px;z-index:5}
+nav.steps button{border:0;background:transparent;border-top:7px solid color-mix(in srgb,var(--accent) 22%,var(--line));border-radius:3px 3px 0 0;padding:8px 4px 2px;text-align:left;cursor:pointer;color:var(--muted);font-size:.8rem;line-height:1.3;min-width:0}
 nav.steps button b{display:block;font-size:.72rem;letter-spacing:.05em;color:inherit}
 nav.steps button span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-nav.steps button.done{border-top-color:var(--accent);color:var(--fg)}
-nav.steps button.active{border-top-color:var(--accent);color:var(--accent);font-weight:600}
+nav.steps button.done{border-top-color:color-mix(in srgb,var(--accent) 45%,transparent);color:var(--fg)}
+nav.steps button.active{border-top-color:var(--accent);color:var(--accent);font-weight:700}
 @media (max-width:640px){ nav.steps button span{display:none} nav.steps button{padding:6px 2px 0} }
 
 section.step{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px clamp(16px,3vw,30px) 26px}
 .step-head{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;margin-bottom:6px}
 .step-num{font-family:var(--display);color:var(--accent);font-size:1.6rem;font-weight:700;font-variant-numeric:tabular-nums}
 .lead{color:var(--muted);max-width:68ch;margin-bottom:20px}
+.upload-panel .row{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:8px}
+.upload-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:14px}
+.upload-panel{background:var(--panel2);border:1px dashed var(--line);border-radius:10px;padding:14px 14px 6px;margin-bottom:18px}
+.upload-panel textarea{width:100%;box-sizing:border-box}
+.hint.busy::before{content:'';display:inline-block;width:10px;height:10px;border:2px solid var(--accent);border-right-color:transparent;border-radius:50%;margin-right:6px;vertical-align:-1px;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .grid{display:grid;gap:16px}
 .g2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .field{margin-bottom:16px;min-width:0}
@@ -98,7 +116,7 @@ section.step{background:var(--panel);border:1px solid var(--line);border-radius:
 .addrow{display:flex;gap:8px;margin-top:10px}
 .addrow input{flex:1}
 
-/* 인과지도 */
+/* 인과순환지도 */
 .cld{display:grid;grid-template-columns:300px 1fr;gap:18px}
 @media (max-width:860px){ .cld{grid-template-columns:1fr} }
 .linkform{display:grid;gap:10px;background:var(--panel2);padding:14px;border-radius:var(--radius);border:1px solid var(--line2)}
@@ -128,7 +146,7 @@ section.step{background:var(--panel);border:1px solid var(--line);border-radius:
 .legend i{display:inline-block;width:22px;height:4px;border-radius:2px;vertical-align:middle;margin-right:4px}
 .acard .mini{width:100%;height:auto;display:block;background:var(--panel2);border-radius:8px;margin-top:2px}
 .acard .mini text{font-family:var(--body)}
-@media print{ body{background:#fff;padding:0} header.top,nav.steps,footer.nav,#ioPanel,.tools,details.facil,.toast,section.step:not([data-step="6"]){display:none!important} section.step[data-step="6"]{display:block!important;border:0;padding:0;box-shadow:none} section.step[data-step="6"] .grid,section.step[data-step="6"] .lead,section.step[data-step="6"] .step-head{display:none!important} .report{border:0;padding:0} .report svg{max-height:120mm} }
+@media print{ body{background:#fff;padding:0} header.top,nav.steps,footer.nav,#ioPanel,.tools,details.facil,.toast,section.step:not([data-step="7"]){display:none!important} section.step[data-step="7"]{display:block!important;border:0;padding:0;box-shadow:none} section.step[data-step="7"] .grid,section.step[data-step="7"] .lead,section.step[data-step="7"] .step-head{display:none!important} .report{border:0;padding:0} .report svg{max-height:120mm} }
 .loop .path{font-size:.9rem;word-break:keep-all}
 .loop .meaning{font-size:.84rem;color:var(--muted)}
 .x{border:0;background:transparent;cursor:pointer;color:var(--muted);padding:0 4px;font-size:1rem}
@@ -147,6 +165,13 @@ section.step{background:var(--panel);border:1px solid var(--line);border-radius:
 .tag{font-size:.74rem;background:var(--warn-soft);color:var(--warn);border-radius:4px;padding:0 6px;font-weight:600}
 
 /* 지렛대 */
+.simlinks{display:grid;gap:4px;max-height:260px;overflow:auto;padding-right:4px}
+.simlink{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.86rem;background:var(--panel);border:1px solid var(--line2);border-radius:8px;padding:5px 8px}
+.simlink b.pos{color:var(--r)} .simlink b.neg{color:var(--b)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;flex:none}
+.seg button{border:0;background:transparent;padding:3px 9px;font-size:.8rem;cursor:pointer;color:var(--muted)}
+.seg button+button{border-left:1px solid var(--line)} .seg button.on{background:var(--accent);color:var(--accent-ink)}
+.sim .linkform .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
 .ladder{display:grid;gap:4px;margin-block:8px 18px}
 .rung{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:8px 12px;border-radius:8px;border:1px solid var(--line2);background:var(--panel2);font-size:.88rem}
 .rung .k{font-family:var(--display);font-weight:700;font-size:1.1rem;color:var(--accent);font-variant-numeric:tabular-nums}
@@ -183,7 +208,7 @@ footer.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
   <div>
     <div class="eyebrow">미래학교자치연구소 · 시스템사고분과</div>
     <h1>일상의 시스템사고 워크숍</h1>
-    <p class="sub">나·가정·학교·사회에서 반복되는 문제 하나를 골라, 사건에서 구조로 내려가 인과순환지도를 그리고 지렛대를 찾는 일곱 단계입니다.</p>
+    <p class="sub">나·가정·학교·사회에서 반복되는 문제 하나를 골라, 사건에서 구조로 내려가 인과순환지도를 그리고 시뮬레이션으로 행태를 확인한 뒤 지렛대를 찾는 여덟 단계입니다.</p>
   </div>
   <div class="tools">
     <select id="sampleSel" aria-label="예시 불러오기">
@@ -211,6 +236,14 @@ footer.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
 <section class="step" data-step="0">
   <div class="step-head"><span class="step-num">1</span><h2>문제 정하기</h2></div>
   <p class="lead">반복해서 나를 괴롭히지만 아직 풀리지 않은 문제를 하나 고릅니다. 사람 탓이 아니라 상황을 말하는 문장으로 적어 보세요.</p>
+  <div class="upload-bar"><button type="button" class="btn" id="btnUpload">📄 자료 업로드</button><span class="hint">일상의 문제 상황, 신문 사설, 책의 한 대목 등을 올리면 내용을 분석해 1단계 또는 전체 초안을 채워 줍니다.</span></div>
+  <div class="upload-panel" id="uploadPanel" hidden>
+    <div class="field"><label class="f" for="srcText">자료 내용</label>
+      <textarea id="srcText" rows="7" placeholder="문장을 붙여 넣거나, 아래에서 텍스트 파일(.txt, .md)을 고르세요."></textarea>
+      <div class="row wrap" style="margin-top:6px"><input type="file" id="srcFile" accept=".txt,.md,.text,text/plain,text/markdown"><span class="hint" id="srcInfo"></span></div></div>
+    <div class="row wrap"><button type="button" class="btn primary" id="btnAnalyzeFull">전체 초안 만들기</button><button type="button" class="btn" id="btnAnalyze">1단계만 채우기</button><button type="button" class="btn" id="btnUploadClose">닫기</button><span class="hint" id="anaStatus"></span></div>
+    <p class="hint">'전체 초안 만들기'는 예시 불러오기처럼 빙산·변수·인과순환지도·원형·지렛대·첫 걸음까지 한 번에 채웁니다(claude.ai에서 열었을 때 AI 분석). 모두 초안이니 단계를 넘기며 자신의 말로 고쳐 쓰세요.</p>
+  </div>
   <div class="field"><label class="f">이 문제는 어디에 있나요?</label>
     <div class="radios" id="domainRadios">
       <label><input type="radio" name="domain" value="나">나 자신</label>
@@ -274,7 +307,7 @@ footer.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
       <p class="hint" style="margin-top:8px">좋은 변수 이름: 명사형 · 증감이 가능 · 중립적 표현 ("게으름" 대신 "휴식 시간", "잔소리" 대신 "통제 시도 횟수")</p>
     </div>
     <div>
-      <label class="f">이런 변수가 자주 등장합니다</label>
+      <label class="f" id="varChipsLabel">이런 변수가 자주 등장합니다</label>
       <div class="chips" id="varChips"></div>
       <details class="facil"><summary>진행자 질문</summary><ul>
         <li>이 문제에서 시간이 지나며 늘거나 준 것은 무엇인가요?</li>
@@ -284,10 +317,10 @@ footer.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
   </div>
 </section>
 
-<!-- 3 인과지도 -->
+<!-- 3 인과순환지도 -->
 <section class="step" data-step="3" hidden>
   <div class="step-head"><span class="step-num">4</span><h2>인과순환지도 그리기</h2></div>
-  <p class="lead">변수 둘을 골라 화살표로 잇습니다. 원인이 늘 때 결과도 늘면 <b>+</b>, 반대로 움직이면 <b>−</b>. 고리가 닫히면 강화(R)인지 균형(B)인지 자동으로 표시됩니다.</p>
+  <p class="lead">변수 둘을 골라 화살표로 잇습니다. 원인이 늘 때 결과도 늘면 <b>+</b>, 반대로 움직이면 <b>−</b>. 루프가 닫히면 강화(R)인지 균형(B)인지 자동으로 표시됩니다.</p>
   <div class="cld">
     <div>
       <div class="linkform">
@@ -303,14 +336,14 @@ footer.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
     <div>
       <div class="canvas">
         <svg id="cldSvg" viewBox="0 0 720 460" role="img" aria-label="인과순환지도"></svg>
-        <div class="bar"><span><span class="legend"><span>상자를 끌어 옮길 수 있습니다. 부호 <b style="color:var(--r)">+</b> <b style="color:var(--b)">−</b>, ∥는 지연.</span><span><i style="background:var(--r)"></i>악순환 R</span><span><i style="background:var(--b)"></i>선순환 R</span><span><i style="background:var(--g)"></i>균형 B</span><span><i style="background:#8a4fa3"></i>겹침은 혼합색</span><span>고리 서술이나 R·B 기호를 누르면 그 고리만 선명해집니다. 화살표 가운데 점을 끌면 그 화살표의 휨이 바뀌고, 두 번 누르면 자동으로 돌아갑니다.</span></span></span><span style="display:flex;gap:8px;align-items:center"><label for="bendRange" style="font-size:.84rem">휘어짐</label><input type="range" id="bendRange" min="0.3" max="2.5" step="0.1" value="1" style="width:110px"><button class="btn small" id="btnAutoLayout">자동 배치</button></span></div>
+        <div class="bar"><span><span class="legend"><span>상자를 끌어 옮길 수 있습니다. 부호 <b style="color:var(--r)">+</b> <b style="color:var(--b)">−</b>, ∥는 지연.</span><span><i style="background:var(--r)"></i>악순환 R</span><span><i style="background:var(--b)"></i>선순환 R</span><span><i style="background:var(--g)"></i>균형 B</span><span><i style="background:#8a4fa3"></i>겹침은 혼합색</span><span>루프 서술이나 R·B 기호를 누르면 그 루프만 선명해집니다. 화살표 가운데 점을 끌면 그 화살표의 휨이 바뀌고, 두 번 누르면 자동으로 돌아갑니다.</span></span></span><span style="display:flex;gap:8px;align-items:center"><label for="bendRange" style="font-size:.84rem">휘어짐</label><input type="range" id="bendRange" min="0.3" max="2.5" step="0.1" value="1" style="width:110px"><button class="btn small" id="btnAutoLayout">자동 배치</button></span></div>
       </div>
       <div class="loops" id="loopList"></div>
     </div>
   </div>
   <details class="facil"><summary>진행자 질문</summary><ul>
-    <li>강화 고리(R)는 눈덩이처럼 커지는 선순환·악순환입니다. 지금 이 고리는 어느 쪽으로 돌고 있나요?</li>
-    <li>균형 고리(B)는 어떤 목표나 한계를 향해 되돌리는 힘입니다. 그 목표는 누가 정했나요?</li>
+    <li>강화 루프(R)는 눈덩이처럼 커지는 선순환·악순환입니다. 지금 이 루프는 어느 쪽으로 돌고 있나요?</li>
+    <li>균형 루프(B)는 어떤 목표나 한계를 향해 되돌리는 힘입니다. 그 목표는 누가 정했나요?</li>
     <li>지연이 있는 화살표에서 우리는 어떤 '성급한 판단'을 하게 되나요?</li></ul></details>
 </section>
 
@@ -326,10 +359,39 @@ footer.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
     <li>이 원형의 '전형적인 실수'를 나도 하고 있지 않았나요?</li></ul></details>
 </section>
 
-<!-- 5 지렛대 -->
+<!-- 5 SD 시뮬레이션 -->
 <section class="step" data-step="5" hidden>
-  <div class="step-head"><span class="step-num">6</span><h2>지렛대 찾기</h2></div>
+  <div class="step-head"><span class="step-num">6</span><h2>SD 시뮬레이션: 구조가 만드는 행태</h2></div>
+  <p class="lead">내가 그린 인과순환지도를 시간에 따라 돌려 봅니다. 핵심 변수에 작은 충격을 주면 루프들이 어떤 곡선을 만드는지, 그리고 어느 변수를 흔들었을 때 핵심 변수가 가장 크게 움직이는지 확인합니다. 숫자는 뜻이 없고 <b>곡선의 모양과 순위</b>만 읽습니다.</p>
+  <div class="grid g2 sim">
+    <div class="linkform">
+      <div class="grid g2">
+        <div><label class="f" for="simCore">지켜볼 핵심 변수</label><select id="simCore"></select></div>
+        <div><label class="f" for="simHorizon">기간</label><select id="simHorizon"><option value="24">짧게</option><option value="48" selected>보통</option><option value="96">길게</option></select></div>
+      </div>
+      <div><label class="f" for="simShock">처음에 주는 충격 <span class="hint" id="simShockVal"></span></label><input type="range" id="simShock" min="-30" max="30" step="5" value="20"></div>
+      <div><label class="f" for="simDelay">지연(‖) 화살표의 늦어지는 정도 <span class="hint" id="simDelayVal"></span></label><input type="range" id="simDelay" min="1" max="10" step="1" value="4"></div>
+      <div><label class="f">화살표의 세기</label><div id="simLinks" class="simlinks"></div><p class="hint">모든 화살표가 같은 세기일 리는 없습니다. 자신 있는 것만 바꿔도 곡선이 달라집니다.</p></div>
+      <div class="row wrap"><button class="btn" id="simReset">기본값으로</button><label class="hint"><input type="checkbox" id="simShowBot" checked> 2단계에서 손으로 그린 패턴 겹쳐 보기</label></div>
+    </div>
+    <div>
+      <div class="canvas"><div class="bar"><b>시간에 따른 변화</b><span class="hint" id="simLegend"></span></div><svg id="simSvg" viewBox="0 0 560 240" width="100%"></svg></div>
+      <div class="canvas" style="margin-top:12px"><div class="bar"><b>어느 변수를 흔들면 핵심 변수가 가장 크게 움직이나</b></div><svg id="sensSvg" viewBox="0 0 560 40" width="100%"></svg><p class="hint" style="padding:0 10px 8px">각 변수를 같은 크기로 한 번씩 밀어 보고 핵심 변수의 누적 변화를 비교한 것입니다. 긴 막대일수록 지렛대 후보입니다. 다만 '움직이기 쉬운 변수'와 '바꾸기 쉬운 변수'는 다릅니다.</p></div>
+      <div class="field" style="margin-top:12px"><label class="f" for="f_simNote">곡선과 순위를 보고 알게 된 것</label><textarea id="f_simNote" placeholder="예: 통제를 세게 할수록 처음엔 내려가지만 지연 뒤에 더 크게 되돌아온다. 가장 민감한 변수는 '대화의 질'이었다."></textarea></div>
+    </div>
+  </div>
+  <details class="facil"><summary>진행자 질문</summary><ul>
+    <li>곡선의 모양이 2단계에서 손으로 그린 패턴과 닮았나요? 닮지 않았다면 지도에 빠진 루프나 지연이 있는지 4단계로 돌아가 봅니다.</li>
+    <li>충격을 반대 방향으로 주면 어떻게 되나요? 세게 밀수록 좋아지나요, 아니면 더 크게 되돌아오나요?</li>
+    <li>가장 민감한 변수는 내가 지금까지 건드려 온 변수와 같은가요?</li></ul></details>
+  <p class="hint">더 정밀한 분석(저량·유량, 실제 수치)은 Vensim, Stella, Insight Maker 같은 SD 도구로 이어집니다. 8단계 요약에 변수·화살표 목록이 함께 담깁니다.</p>
+</section>
+
+<!-- 6 지렛대 -->
+<section class="step" data-step="6" hidden>
+  <div class="step-head"><span class="step-num">7</span><h2>지렛대 찾기</h2></div>
   <p class="lead">도넬라 메도즈의 지렛대 목록을 여덟 단으로 간추렸습니다. 아래로 갈수록 작은 힘으로 큰 변화를 만들지만 바꾸기는 어렵습니다. 내 개입이 어느 단에 닿는지 확인해 보세요.</p>
+  <div id="sensHint" class="hint" style="margin-bottom:10px"></div>
   <div class="ladder" id="ladder"></div>
   <div class="linkform" style="margin-bottom:12px">
     <div class="grid g2">
@@ -342,13 +404,13 @@ footer.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
   <div id="leverList"></div>
   <details class="facil"><summary>진행자 질문</summary><ul>
     <li>이 개입은 증상(사건)을 건드리나요, 구조를 건드리나요?</li>
-    <li>이 개입이 다른 고리를 자극해 생기는 부작용은 무엇일까요? 특히 R 고리를 더 빠르게 돌리지는 않나요?</li>
+    <li>이 개입이 다른 루프를 자극해 생기는 부작용은 무엇일까요? 특히 R 루프를 더 빠르게 돌리지는 않나요?</li>
     <li>효과가 나타나기까지 얼마나 기다려야 하나요? 그동안 포기하지 않으려면 무엇을 보고 있어야 하나요?</li></ul></details>
 </section>
 
 <!-- 6 실천 -->
-<section class="step" data-step="6" hidden>
-  <div class="step-head"><span class="step-num">7</span><h2>첫 걸음과 한 장 요약</h2></div>
+<section class="step" data-step="7" hidden>
+  <div class="step-head"><span class="step-num">8</span><h2>첫 걸음과 한 장 요약</h2></div>
   <p class="lead">지렛대 하나를 골라 이번 주에 할 수 있는 가장 작은 행동으로 바꿉니다. 그리고 효과를 '언제, 어떤 변수로' 확인할지 미리 정합니다.</p>
   <div class="grid g2">
     <div class="field"><label class="f" for="f_first">이번 주의 첫 걸음</label><textarea id="f_first" placeholder="작고 구체적으로. 누가 봐도 했는지 안 했는지 알 수 있게"></textarea></div>
@@ -368,7 +430,7 @@ footer.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
 (function(){
 'use strict';
 const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
-const STEPS=['문제','빙산','변수','인과지도','원형','지렛대','실천'];
+const STEPS=['문제','빙산','변수','인과순환지도','원형','시뮬레이션','지렛대','실천'];
 const DOMAIN_VARS={
  '나':['수면 시간','운동 횟수','미루는 일의 양','자기 비난','에너지 수준','집중 시간','스마트폰 사용 시간','성취 경험'],
  '가정':['대화 시간','통제 시도 횟수','자녀의 반발심','신뢰','집안일 분담 정도','스마트폰 사용 시간','부모의 피로','자율성 경험'],
@@ -378,18 +440,18 @@ const LEVELS=[
  {k:1,name:'수치·매개변수',desc:'예산, 시간, 벌칙·보상의 크기 같은 숫자를 바꾼다.',ex:'공부 시간 30분 늘리기, 벌점 올리기'},
  {k:2,name:'완충장치·물리 구조',desc:'여유분, 공간과 동선, 흐름의 물리적 구조를 바꾼다.',ex:'스마트폰을 거실에 두기, 보고 양식 통합'},
  {k:3,name:'지연 시간',desc:'정보나 효과가 전달되는 데 걸리는 시간을 줄이거나 늘린다.',ex:'학기말 피드백을 매주 피드백으로'},
- {k:4,name:'피드백 고리의 강도',desc:'악순환은 약하게, 균형 고리는 강하게 만든다.',ex:'작은 성공을 바로 알아차리고 인정하기'},
+ {k:4,name:'피드백 루프의 강도',desc:'악순환은 약하게, 균형 루프는 강하게 만든다.',ex:'작은 성공을 바로 알아차리고 인정하기'},
  {k:5,name:'정보 흐름',desc:'누가, 무엇을, 언제 알게 되는지를 바꾼다.',ex:'공동 자원의 상태를 모두가 보게 하기'},
  {k:6,name:'규칙·인센티브',desc:'무엇이 허용되고 무엇이 보상받는지의 규칙을 바꾼다.',ex:'회의 시간 상한, 평가 기준 변경, 함께 정한 약속'},
  {k:7,name:'목표',desc:'시스템이 무엇을 위해 움직이는지, 목표 자체를 바꾼다.',ex:'"성적 향상"에서 "배움의 즐거움"으로'},
  {k:8,name:'패러다임·마음의 모델',desc:'문제를 바라보는 전제와 믿음을 바꾼다.',ex:'"통제할 대상"에서 "함께 설계하는 동료"로'}];
 const ARCH=[
- {id:'fix',name:'미봉책 (응급처치의 실패)',sig:{B:1,R:1},structure:'증상을 빠르게 줄이는 균형 고리(B)가 있지만, 그 처방이 지연을 두고 증상을 다시 키우는 강화 고리(R)를 만든다.',signals:['같은 문제가 반복해서 돌아온다','처방을 쓸 때마다 잠깐 좋아졌다가 더 나빠진다','"이번만 넘기자"는 말이 자주 나온다'],lever:'단기 처방의 부작용 경로를 끊고, 느리지만 근본 원인에 작용하는 고리에 투자한다.'},
- {id:'shift',name:'부담 떠넘기기',sig:{B:2,R:1},structure:'증상을 푸는 두 균형 고리(대증적·근본적)가 있고, 대증 처방이 근본 역량을 약하게 만드는 부작용 고리(R)가 돈다.',signals:['외부 도움이나 대체 수단에 점점 더 의존한다','스스로 해결하는 힘이 약해진다','근본 대책은 늘 "나중에"로 밀린다'],lever:'대증 처방에 상한을 두고, 근본 역량을 키우는 고리에 시간을 떼어 둔다.'},
- {id:'limits',name:'성장의 한계',sig:{R:1,B:1},structure:'성장을 만드는 강화 고리(R)가 있고, 성장이 커질수록 제약이 작동하는 균형 고리(B)가 성장을 멈추게 한다.',signals:['처음엔 잘 되다가 어느 순간 정체된다','더 열심히 밀어붙여도 효과가 없다','숨은 제약(체력·시간·관계·공간)이 있다'],lever:'성장 엔진을 더 밀기보다 제약 조건 자체를 찾아 풀어 준다.'},
- {id:'erode',name:'목표 침식',sig:{B:2},structure:'목표와 현실의 격차를 줄이는 두 고리 중, 현실을 끌어올리기보다 목표를 낮추는 쪽이 쉬워 기준이 서서히 내려간다.',signals:['"현실적으로 이 정도면"이라는 말이 늘었다','기준이 낮아진 것을 한참 뒤에 알아차린다','격차를 설명하는 이유가 쌓인다'],lever:'목표를 바깥에 고정하고(공개 선언, 절대 기준), 현실을 개선하는 고리의 지연을 줄인다.'},
- {id:'escal',name:'단계적 확대',sig:{B:2,R:1},structure:'두 당사자가 서로의 행동에 반응하며 자극하는 두 균형 고리가 하나의 거대한 강화 고리처럼 돈다.',signals:['상대가 세게 나오니 나도 더 세게 나간다','갈등이나 경쟁의 수위가 점점 높아진다','누구도 먼저 멈추지 못한다'],lever:'한쪽이 먼저 수위를 낮추거나, 공동의 목표와 규칙을 합의해 고리를 끊는다.'},
- {id:'success',name:'성공한 쪽에 더 많이',sig:{R:2},structure:'한정된 자원이 성과 좋은 쪽으로 몰리면서 한쪽은 강화 고리로 커지고 다른 쪽은 쇠퇴한다.',signals:['잘하는 학생·부서에 기회가 몰린다','뒤처진 쪽은 기회조차 받지 못한다','격차가 스스로 커진다'],lever:'자원 배분 규칙을 바꾸고, 뒤처진 쪽의 첫 성공 경험을 설계한다.'},
+ {id:'fix',name:'미봉책 (응급처치의 실패)',sig:{B:1,R:1},structure:'증상을 빠르게 줄이는 균형 루프(B)가 있지만, 그 처방이 지연을 두고 증상을 다시 키우는 강화 루프(R)를 만든다.',signals:['같은 문제가 반복해서 돌아온다','처방을 쓸 때마다 잠깐 좋아졌다가 더 나빠진다','"이번만 넘기자"는 말이 자주 나온다'],lever:'단기 처방의 부작용 경로를 끊고, 느리지만 근본 원인에 작용하는 루프에 투자한다.'},
+ {id:'shift',name:'부담 떠넘기기',sig:{B:2,R:1},structure:'증상을 푸는 두 균형 루프(대증적·근본적)가 있고, 대증 처방이 근본 역량을 약하게 만드는 부작용 루프(R)가 돈다.',signals:['외부 도움이나 대체 수단에 점점 더 의존한다','스스로 해결하는 힘이 약해진다','근본 대책은 늘 "나중에"로 밀린다'],lever:'대증 처방에 상한을 두고, 근본 역량을 키우는 루프에 시간을 떼어 둔다.'},
+ {id:'limits',name:'성장의 한계',sig:{R:1,B:1},structure:'성장을 만드는 강화 루프(R)가 있고, 성장이 커질수록 제약이 작동하는 균형 루프(B)가 성장을 멈추게 한다.',signals:['처음엔 잘 되다가 어느 순간 정체된다','더 열심히 밀어붙여도 효과가 없다','숨은 제약(체력·시간·관계·공간)이 있다'],lever:'성장 엔진을 더 밀기보다 제약 조건 자체를 찾아 풀어 준다.'},
+ {id:'erode',name:'목표 침식',sig:{B:2},structure:'목표와 현실의 격차를 줄이는 두 루프 중, 현실을 끌어올리기보다 목표를 낮추는 쪽이 쉬워 기준이 서서히 내려간다.',signals:['"현실적으로 이 정도면"이라는 말이 늘었다','기준이 낮아진 것을 한참 뒤에 알아차린다','격차를 설명하는 이유가 쌓인다'],lever:'목표를 바깥에 고정하고(공개 선언, 절대 기준), 현실을 개선하는 루프의 지연을 줄인다.'},
+ {id:'escal',name:'단계적 확대',sig:{B:2,R:1},structure:'두 당사자가 서로의 행동에 반응하며 자극하는 두 균형 루프가 하나의 거대한 강화 루프처럼 돈다.',signals:['상대가 세게 나오니 나도 더 세게 나간다','갈등이나 경쟁의 수위가 점점 높아진다','누구도 먼저 멈추지 못한다'],lever:'한쪽이 먼저 수위를 낮추거나, 공동의 목표와 규칙을 합의해 루프를 끊는다.'},
+ {id:'success',name:'성공한 쪽에 더 많이',sig:{R:2},structure:'한정된 자원이 성과 좋은 쪽으로 몰리면서 한쪽은 강화 루프로 커지고 다른 쪽은 쇠퇴한다.',signals:['잘하는 학생·부서에 기회가 몰린다','뒤처진 쪽은 기회조차 받지 못한다','격차가 스스로 커진다'],lever:'자원 배분 규칙을 바꾸고, 뒤처진 쪽의 첫 성공 경험을 설계한다.'},
  {id:'commons',name:'공유지의 비극',sig:{R:2,B:1},structure:'각자 자신에게 이익인 행동을 늘리지만, 모두가 쓰는 공동 자원이 바닥나 결국 모두의 이익이 줄어든다.',signals:['각자는 합리적인데 전체는 나빠진다','공동 자원(시간·공간·신뢰·에너지)이 고갈된다','"나 하나쯤은"이 쌓인다'],lever:'공동 자원의 상태를 모두에게 보이게 하고(정보 흐름), 사용 규칙을 함께 정한다.'},
  {id:'under',name:'성장과 투자 부족',sig:{R:1,B:2},structure:'성장이 역량의 한계에 부딪히는데, 역량 투자가 늦어지거나 성과 기준을 낮춰 투자 필요를 느끼지 못하게 된다.',signals:['수요는 느는데 역량 확충은 늘 뒤늦다','품질 저하를 "원래 그렇다"로 받아들인다','투자 결정이 성과 하락 뒤에야 온다'],lever:'성과 기준을 유지하고, 수요가 나타나기 전에 미리 역량에 투자한다.'}];
 
@@ -417,7 +479,7 @@ const SAMPLES=[
   first:'다음 학급회의에서 수면 시간 익명 조사와 11시 알림 끄기 약속을 안건으로 올리기',who:'학급 자치회, 담임, 학부모회',signal:'4주 뒤 평균 수면 시간(익명 조사), 1교시 엎드린 학생 수',review:'11월 넷째 주'}];
 
 let S; const KEY='stw-v1'; let step=0; let loopsCache=[];
-function blank(){ return {domain:'',title:'',situation:'',desired:'',duration:'',tried:'',events:'',botLabel:'',bot:[],pattern:'',structure:'',mental:'',vars:[],links:[],pos:{},arch:'',archNote:'',levers:[],first:'',who:'',signal:'',review:'',sign:'+',loopKind:{},bend:1}; }
+function blank(){ return {domain:'',title:'',situation:'',desired:'',duration:'',tried:'',events:'',botLabel:'',bot:[],pattern:'',structure:'',mental:'',vars:[],links:[],pos:{},arch:'',archNote:'',levers:[],first:'',who:'',signal:'',review:'',sign:'+',loopKind:{},bend:1,srcVars:[],simNote:'',sim:{},sens:[],simSeen:false}; }
 function load(){ try{ const t=localStorage.getItem(KEY); if(t){ S=Object.assign(blank(),JSON.parse(t)); return; } }catch(e){} S=blank(); }
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(S)); }catch(e){} }
 function uid(){ return 'v'+Math.random().toString(36).slice(2,8); }
@@ -428,17 +490,93 @@ const coreVar=()=>S.vars.find(v=>v.core);
 
 /* ---------- 단계 이동 ---------- */
 function stepDone(i){
- switch(i){case 0:return !!S.title;case 1:return !!(S.pattern||S.structure||S.bot.length);case 2:return S.vars.length>=2;case 3:return S.links.length>=1;case 4:return !!S.arch;case 5:return S.levers.length>=1;case 6:return !!S.first;} }
+ switch(i){case 0:return !!S.title;case 1:return !!(S.pattern||S.structure||S.bot.length);case 2:return S.vars.length>=2;case 3:return S.links.length>=1;case 4:return !!S.arch;case 5:return !!S.simSeen;case 6:return S.levers.length>=1;case 7:return !!S.first;} }
 function renderNav(){ const n=$('#stepNav'); n.innerHTML=STEPS.map((s,i)=>`<button type="button" data-i="${i}" class="${i===step?'active':''} ${stepDone(i)?'done':''}"><b>${i+1}</b><span>${s}</span></button>`).join('');
- $('#btnPrev').disabled=step===0; $('#btnNext').textContent= step===6?'완료 ✓':'다음 →'; }
-function go(i){ step=Math.max(0,Math.min(6,i)); $$('section.step').forEach(s=>s.hidden=+s.dataset.step!==step); renderNav(); renderStep(); window.scrollTo({top:0,behavior:'smooth'}); }
+ $('#btnPrev').disabled=step===0; $('#btnNext').textContent= step===7?'완료 ✓':'다음 →'; }
+function go(i){ step=Math.max(0,Math.min(7,i)); $$('section.step').forEach(s=>s.hidden=+s.dataset.step!==step); renderNav(); renderStep(); window.scrollTo({top:0,behavior:'smooth'}); }
 $('#stepNav').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) go(+b.dataset.i); });
-$('#btnPrev').onclick=()=>go(step-1); $('#btnNext').onclick=()=>{ if(step===6){ toast('수고하셨습니다. 요약을 복사해 두세요.'); } else go(step+1); };
+$('#btnPrev').onclick=()=>go(step-1); $('#btnNext').onclick=()=>{ if(step===7){ toast('수고하셨습니다. 요약을 복사해 두세요.'); } else go(step+1); };
 
 /* ---------- 텍스트 필드 바인딩 ---------- */
-const FIELDS=['title','situation','desired','duration','tried','events','botLabel','pattern','structure','mental','archNote','first','who','signal','review'];
-FIELDS.forEach(f=>{ const el=$('#f_'+f); el.addEventListener('input',()=>{ S[f]=el.value; save(); renderNav(); if(step===6) renderReport(); }); });
+const FIELDS=['title','situation','desired','duration','tried','events','botLabel','pattern','structure','mental','archNote','first','who','signal','review','simNote'];
+FIELDS.forEach(f=>{ const el=$('#f_'+f); el.addEventListener('input',()=>{ S[f]=el.value; save(); renderNav(); if(step===7) renderReport(); }); });
 $('#domainRadios').addEventListener('change',e=>{ S.domain=e.target.value; save(); renderChips(); });
+/* ── 자료 업로드 → 문제 정하기 자동 채우기 ── */
+$('#btnUpload').addEventListener('click',()=>{ const p=$('#uploadPanel'); p.hidden=!p.hidden; if(!p.hidden) $('#srcText').focus(); });
+$('#btnUploadClose').addEventListener('click',()=>{ $('#uploadPanel').hidden=true; });
+$('#srcFile').addEventListener('change',async e=>{ const f=e.target.files[0]; if(!f) return; if(f.size>400000){ $('#srcInfo').textContent='파일이 너무 큽니다(400KB 이하).'; return; } const t=await f.text(); $('#srcText').value=t; $('#srcInfo').textContent=`${f.name} · ${t.length.toLocaleString()}자`; });
+$('#btnAnalyze').addEventListener('click',()=>analyzeSource('step1')); $('#btnAnalyzeFull').addEventListener('click',()=>analyzeSource('full'));
+const DUR_OPTS=['몇 주','몇 달','1년 안팎','여러 해'];
+async function analyzeSource(mode){
+ const text=$('#srcText').value.trim(); const st=$('#anaStatus');
+ if(text.length<20){ st.textContent='분석할 내용이 너무 짧습니다. 몇 문장 이상 넣어 주세요.'; return; }
+ if(mode==='full' && (S.vars.length||S.links.length||S.levers.length) && !confirm('지금 작업한 내용(변수·지도·지렛대 등)을 지우고 자료로 전체 초안을 새로 만듭니다. 계속할까요?')) return;
+ st.className='hint busy'; st.textContent= mode==='full'?'자료를 읽고 전체 초안을 만드는 중… (20~40초)':'분석 중…'; $('#btnAnalyze').disabled=$('#btnAnalyzeFull').disabled=true;
+ let r=null, how='규칙';
+ try{ r=await analyzeWithClaude(text,mode); if(r) how='AI'; }catch(e){ console.warn(e); r=null; }
+ if(!r) r=analyzeLocally(text);
+ if(mode==='full' && how==='AI' && Array.isArray(r.vars) && r.vars.length>=2) applyFull(r); else applyAnalysis(r);
+ st.className='hint';
+ st.textContent= how==='AI' ? (mode==='full'?'AI가 전체 초안을 만들었습니다. 예시처럼 각 단계를 넘기며 고쳐 쓰세요.':'AI가 내용을 분석해 1단계를 채웠습니다. 읽고 자신의 말로 다듬어 주세요.')
+  : '간단한 규칙으로 1단계와 변수 후보만 채웠습니다. 전체 초안은 claude.ai에서 열었을 때 AI로 만들 수 있습니다.';
+ $('#btnAnalyze').disabled=$('#btnAnalyzeFull').disabled=false; toast(mode==='full'&&how==='AI'?'전체 초안을 만들었습니다':'1단계 칸을 채웠습니다');
+}
+function applyAnalysis(r){
+ if(r.domain && ['나','가정','학교','사회'].includes(r.domain)) S.domain=r.domain;
+ ['title','situation','desired','tried'].forEach(k=>{ if(r[k]) S[k]=String(r[k]).trim(); });
+ if(r.duration && DUR_OPTS.includes(r.duration)) S.duration=r.duration;
+ if(Array.isArray(r.vars)&&r.vars.length){ S.srcVars=r.vars.map(v=>String(v).replace('*','').trim()).filter(Boolean).slice(0,8); }
+ save(); fillFields(); renderChips();
+}
+function applyFull(r){
+ const sm={}; ['domain','title','situation','desired','duration','tried','events','botLabel','pattern','structure','mental','archNote','first','who','signal','review'].forEach(k=>sm[k]=r[k]?String(r[k]).trim():'');
+ if(!['나','가정','학교','사회'].includes(sm.domain)) sm.domain='';
+ if(!DUR_OPTS.includes(sm.duration)) sm.duration='';
+ sm.shape=['up','down','osc','boom','saw','plateau'].includes(r.shape)?r.shape:'saw';
+ const vars=r.vars.map(v=>String(v).trim()).filter(Boolean).slice(0,8); if(!vars.some(v=>v.endsWith('*'))) vars[0]+='*';
+ sm.vars=vars; const n=vars.length;
+ const seen=new Set(); sm.links=(Array.isArray(r.links)?r.links:[]).map(l=>Array.isArray(l)?l:[l.from,l.to,l.sign,l.delay]).filter(l=>Number.isInteger(+l[0])&&Number.isInteger(+l[1])&&+l[0]>=0&&+l[0]<n&&+l[1]>=0&&+l[1]<n&&+l[0]!==+l[1]).map(l=>[+l[0],+l[1],l[2]==='-'?'-':'+',l[3]?1:0]).filter(l=>{ const k=l[0]+'|'+l[1]; if(seen.has(k)) return false; seen.add(k); return true; }).slice(0,16);
+ sm.arch=ARCH.some(a=>a.id===r.arch)?r.arch:'';
+ sm.levers=(Array.isArray(r.levers)?r.levers:[]).map(l=>({t:(Number.isInteger(+l.t)&&+l.t<n)?'v'+(+l.t):(typeof l.t==='string'&&/^v\d+$/.test(l.t)?l.t:'v0'),k:Math.max(1,Math.min(8,+l.k||4)),a:String(l.a||'').trim(),c:[0,0,0]})).filter(l=>l.a).slice(0,5);
+ const more=(Array.isArray(r.moreVars)?r.moreVars:[]).map(v=>String(v).replace('*','').trim()).filter(Boolean);
+ loadSample(sm); S.srcVars=[...new Set([...more,...vars.map(v=>v.replace('*',''))])].slice(0,14); save(); renderChips(); $('#uploadPanel').hidden=true;
+}
+async function analyzeWithClaude(text,mode){
+ if(!window.claude||typeof window.claude.use!=='function') return null;
+ const sample=await window.claude.use('sample'); if(!sample) return null;
+ const common='사람 탓이 아니라 \'무엇이 반복되는가\'를 말하는 중립적 문장을 쓰고, 자료에 없는 내용은 지어내지 말고 빈 문자열로 두십시오. 한국어, 간결한 서술체. JSON만 답하십시오.\n';
+ let prompt;
+ if(mode==='full'){
+  prompt='다음 자료를 시스템사고 워크숍(문제→빙산→변수→인과순환지도→시스템 원형→지렛대→첫 걸음)의 초안으로 분석하십시오. '+common+
+  '형식: {"domain":"나|가정|학교|사회","title":"문제 한 문장(60자 이내)","situation":"지금 일어나는 일(2~3문장)","desired":"바라는 상태(1~2문장)","duration":"몇 주|몇 달|1년 안팎|여러 해 또는 빈 문자열","tried":"해 본 해결책과 결과(1~3문장)",'+
+  '"events":"최근 사건 하나(1문장)","botLabel":"시간에 따라 추적할 핵심 변수 이름","shape":"up|down|osc|boom|saw|plateau 중 변화 모양","pattern":"시간에 따른 패턴(1~2문장)","structure":"패턴을 만드는 구조(2~3문장, 인과 연쇄로)","mental":"구조를 당연하게 만드는 믿음 1~2개를 따옴표로",'+
+  '"vars":["늘거나 줄 수 있는 중립적 명사형 변수 5~7개. 핵심 변수 하나는 이름 끝에 *"],"moreVars":["지도에는 넣지 않았지만 자료에서 생각해 볼 만한 변수 후보 6~8개. 중립적 명사형, vars와 겹치지 않게"],'+
+  '"links":[[원인 변수 번호,결과 변수 번호,"+ 또는 -",지연이면 1 아니면 0] 6~12개. 번호는 vars 배열의 0부터 시작하는 순서. 반드시 닫힌 루프가 1개 이상 생기도록],'+
+  '"arch":"fix|shift|limits|erode|escal|success|commons|under 중 가장 닮은 원형 (fix=미봉책, shift=부담 떠넘기기, limits=성장의 한계, erode=목표 침식, escal=단계적 확대, success=성공한 쪽에 더, commons=공유지의 비극, under=성장과 투자 부족)","archNote":"왜 그 원형인지(1~2문장, 루프로 설명)",'+
+  '"levers":[{"t":대상 변수 번호,"k":지렛대 단(1 수치, 2 물리구조, 3 지연, 4 루프 강도, 5 정보 흐름, 6 규칙, 7 목표, 8 마음의 모델),"a":"구체적 행동"} 3개, 서로 다른 단으로],'+
+  '"first":"이번 주에 할 가장 작은 첫 걸음(1문장)","who":"함께할 사람","signal":"효과를 확인할 신호와 시점","review":"점검 시기"}\n\n자료:\n'+text.slice(0,12000);
+ } else {
+  prompt='다음 자료를 시스템사고 워크숍의 \'문제 정하기\' 단계에 맞게 분석하십시오. '+common+
+  '형식: {"domain":"나|가정|학교|사회 중 하나","title":"문제를 한 문장으로(60자 이내)","situation":"지금 일어나고 있는 일(2~4문장)","desired":"바라는 상태(1~3문장)","duration":"몇 주|몇 달|1년 안팎|여러 해 중 하나 또는 빈 문자열","tried":"지금까지 해 본 해결책과 그 결과(1~3문장, 없으면 빈 문자열)","vars":["늘거나 줄 수 있는 핵심 변수 5~8개, 중립적 명사형"]}\n\n자료:\n'+text.slice(0,12000);
+ }
+ const v=await sample.json(prompt,{modelTier:mode==='full'?'complex':'default',cache:false}); return (v&&typeof v==='object')?v:null;
+}
+function analyzeLocally(text){
+ const sents=text.replace(/\s+/g,' ').split(/(?<=[.!?。])\s+/).map(x=>x.trim()).filter(x=>x.length>5);
+ const has=(s,re)=>re.test(s);
+ const R={나:/나는|내가|저는|제가|스스로|습관|다짐/g,가정:/가족|부모|자녀|아이|남편|아내|집에서|형제|엄마|아빠/g,학교:/학교|교사|선생|학생|수업|교실|학급|교육청|평가|학부모/g,사회:/정부|정책|사회|국가|시민|지역|제도|언론|경제|기업/g};
+ const sc=Object.entries(R).map(([k,re])=>[k,(text.match(re)||[]).length]).sort((a,b)=>b[1]-a[1]); const dom=sc[0][1]>0?sc[0][0]:'';
+ const tried=sents.filter(s=>has(s,/했지만|해 봤|해봤|시도|노력|조치|대책|도입|추진|실시|했으나|했는데도|했더니/)).slice(0,3).join(' ');
+ const desired=sents.filter(s=>has(s,/바란다|원한다|되어야|해야 한다|필요하다|목표|되기를|했으면|이상적|바람직/)).slice(0,2).join(' ');
+ const rest=sents.filter(s=>!tried.includes(s)&&!desired.includes(s));
+ const situation=rest.slice(0,3).join(' ');
+ let title=(rest[0]||sents[0]||'').replace(/^[“"'‘]+|[”"'’]+$/g,''); if(title.length>60) title=title.slice(0,57)+'…';
+ const duration= /수십 년|수 년|여러 해|\d+\s*년째|오랫동안|오래전부터|해마다|매년/.test(text)?'여러 해': /1년|일 년|작년|지난해/.test(text)?'1년 안팎': /\d+\s*(개월|달)|몇 달|한 학기|학기/.test(text)?'몇 달': /\d+\s*주|몇 주|최근/.test(text)?'몇 주':'';
+ const stop=/^(그리고|그러나|하지만|또한|이것|그것|우리|이런|그런|때문|대한|통해|위해|경우|문제|상황|있다|없다|한다|된다)$/;
+ const freq={}; (text.match(/[가-힣]{2,6}/g)||[]).forEach(w=>{ if(!stop.test(w)) freq[w]=(freq[w]||0)+1; });
+ const vars=Object.entries(freq).filter(([w,c])=>c>=2).sort((a,b)=>b[1]-a[1]).slice(0,6).map(x=>x[0]);
+ return {domain:dom,title,situation,desired,duration,tried,vars};
+}
 function fillFields(){ FIELDS.forEach(f=>{ $('#f_'+f).value=S[f]||''; }); $$('#domainRadios input').forEach(r=>r.checked=r.value===S.domain); }
 
 /* ---------- BOT 그래프 ---------- */
@@ -475,11 +613,11 @@ $('#varList').addEventListener('click',e=>{ const b=e.target.closest('button'); 
  save(); renderVars(); renderNav(); });
 $('#btnAddVar').onclick=()=>{ addVar($('#varInput').value); $('#varInput').value=''; $('#varInput').focus(); };
 $('#varInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); $('#btnAddVar').click(); } });
-function renderChips(){ const list=DOMAIN_VARS[S.domain]||[...new Set(Object.values(DOMAIN_VARS).flat())].slice(0,10);
+function renderChips(){ const lb=$('#varChipsLabel'); if(lb) lb.textContent=(S.srcVars&&S.srcVars.length)?'올린 자료에서 찾은 변수 후보입니다':'이런 변수가 자주 등장합니다'; const base=DOMAIN_VARS[S.domain]||[...new Set(Object.values(DOMAIN_VARS).flat())].slice(0,10); const list=[...new Set([...(S.srcVars||[]),...base])];
  $('#varChips').innerHTML=list.filter(n=>!S.vars.some(v=>v.name===n)).map(n=>`<button type="button" class="chip">${esc(n)}</button>`).join('')||'<span class="hint">예시를 모두 추가했습니다.</span>'; }
 $('#varChips').addEventListener('click',e=>{ const c=e.target.closest('.chip'); if(c) addVar(c.textContent); });
 
-/* ---------- 인과지도 ---------- */
+/* ---------- 인과순환지도 ---------- */
 const CW=720,CH=460;
 function autoLayout(){ const n=S.vars.length; S.vars.forEach((v,i)=>{ const a=-Math.PI/2+i*2*Math.PI/n; S.pos[v.id]={x:Math.round(CW/2+Math.cos(a)*(CW/2-110)),y:Math.round(CH/2+Math.sin(a)*(CH/2-60))}; }); }
 function ensurePos(){ let need=false; S.vars.forEach(v=>{ if(!S.pos[v.id]) need=true; }); if(need) autoLayout(); }
@@ -533,7 +671,7 @@ function loopArc(cx,cy,r,cw,col,label,fs,fillText){ const th0=-Math.PI/2, th1=th
 function loopMarkerDefs(cols,size){ return cols.map(col=>`<marker id="la${col.replace('#','')}" viewBox="0 0 10 10" refX="0" refY="5" markerWidth="${size}" markerHeight="${size}" orient="auto"><path d="M0 0L10 5L0 10z" fill="${col}"/></marker>`).join(''); }
 function bendFor(a,c,lps,centroids,pairBack,base,strength,override){ strength=strength||1; const dx=c.x-a.x, dy=c.y-a.y, d=Math.hypot(dx,dy)||1; let nx=-dy/d, ny=dx/d; let k=base*d, sign=1;
  if(lps.length){ const cen=centroids[lps[0].key]; const mx=(a.x+c.x)/2-cen.cx, my=(a.y+c.y)/2-cen.cy; const dot=nx*mx+ny*my; if(Math.hypot(mx,my)>4) sign= dot>=0?1:-1; else sign=-1;
-  const n=Math.max(2,cen.n||3); const circ=2*(cen.R||d/2)*(1-Math.cos(Math.PI/n)); k=Math.max(0.12*d, Math.min(1.1*d, n===2? circ*(strength>=1&&centroids.__mini?0.85:0.65) : circ)); }
+  const n=Math.max(2,cen.n||3); const circ=2*(cen.R||d/2)*(1-Math.cos(Math.PI/n)); k=Math.max(0.12*d, Math.min(1.1*d, n===2? circ*(centroids.__mini?0.75:0.65) : circ)); }
  else if(pairBack) k=0.22*d;
  k*=strength; if(override!=null){ return {x:(a.x+c.x)/2+nx*override, y:(a.y+c.y)/2+ny*override}; }
  return {x:(a.x+c.x)/2+nx*k*sign, y:(a.y+c.y)/2+ny*k*sign}; }
@@ -554,74 +692,79 @@ $('#btnAddLink').onclick=()=>{ const f=$('#linkFrom').value,t=$('#linkTo').value
  if(S.links.some(l=>l.from===f&&l.to===t)){ toast('이미 있는 화살표입니다'); return; } S.links.push({from:f,to:t,sign:S.sign||'+',delay:$('#linkDelay').checked}); $('#linkDelay').checked=false; save(); renderCLDStep(); renderNav(); };
 $('#linkList').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const i=+b.dataset.i; if(b.dataset.act==='del') S.links.splice(i,1); else if(b.dataset.act==='flip') S.links[i].sign= S.links[i].sign==='+'?'-':'+'; save(); renderCLDStep(); renderNav(); });
 function loopMeaning(lp){ const core=coreVar(); const hasCore=core&&lp.nodes.includes(core.id);
- if(lp.type==='R') return (hasCore?`핵심 변수를 지나는 강화 고리입니다. `:'')+`한 바퀴 돌 때마다 변화가 커지는 눈덩이 구조입니다. 지금 ${lp.kind==='virtuous'?'선순환':'악순환'}으로 돌고 있다고 표시했습니다(아래에서 바꿀 수 있어요).`+(lp.delay?' 지연이 있어 효과를 늦게 알아차립니다.':'');
- return (hasCore?`핵심 변수를 지나는 균형 고리입니다. `:'')+`변화를 되돌려 어떤 수준으로 맞추려는 구조입니다. 그 목표가 무엇인지 물어보세요.`+(lp.delay?' 지연이 있어 과잉 반응과 진동이 생기기 쉽습니다.':''); }
+ if(lp.type==='R') return (hasCore?`핵심 변수를 지나는 강화 루프입니다. `:'')+`한 바퀴 돌 때마다 변화가 커지는 눈덩이 구조입니다. 지금 ${lp.kind==='virtuous'?'선순환':'악순환'}으로 돌고 있다고 표시했습니다(아래에서 바꿀 수 있어요).`+(lp.delay?' 지연이 있어 효과를 늦게 알아차립니다.':'');
+ return (hasCore?`핵심 변수를 지나는 균형 루프입니다. `:'')+`변화를 되돌려 어떤 수준으로 맞추려는 구조입니다. 그 목표가 무엇인지 물어보세요.`+(lp.delay?' 지연이 있어 과잉 반응과 진동이 생기기 쉽습니다.':''); }
 function renderCLDStep(){ const opts=S.vars.map(v=>`<option value="${v.id}">${esc(v.name)}</option>`).join('');
  const f=$('#linkFrom'),t=$('#linkTo'); const fv=f.value,tv=t.value; f.innerHTML=opts; t.innerHTML=opts; if(S.vars.some(v=>v.id===fv)) f.value=fv; if(S.vars.some(v=>v.id===tv)) t.value=tv; else if(S.vars.length>1) t.value=S.vars[1].id;
  setSign(S.sign||'+'); $('#bendRange').value=S.bend||1; loopsCache=findLoops(); drawCLD($('#cldSvg'),true);
  $('#linkList').innerHTML=S.links.map((l,i)=>`<li><span class="t">${esc(vname(l.from))} → ${esc(vname(l.to))}${l.delay?' <span class="hint">∥지연</span>':''}</span><button class="pill ${l.sign==='+'?'pos':'neg'}" style="border:0;cursor:pointer" data-act="flip" data-i="${i}" title="부호 바꾸기">${l.sign==='+'?'+':'−'}</button><button class="x" data-act="del" data-i="${i}">✕</button></li>`).join('');
- $('#loopList').innerHTML= loopsCache.length? loopsCache.map(lp=>`<div class="loop ${lp.type} ${lp.kind} ${focusKeys.has(lp.key)?'focus':''}" data-key="${lp.key}" role="button" tabindex="0" title="누르면 이 고리만 선명하게 보입니다"><div class="lab">${lp.label}</div><div><div class="path">${lp.nodes.map(vname).map(esc).join(' → ')} → ${esc(vname(lp.nodes[0]))}</div><div class="meaning">${loopMeaning(lp)}</div>${lp.type==='R'?`<div class="kind"><button type="button" data-kind="vicious" class="v ${lp.kind==='vicious'?'on':''}">악순환</button><button type="button" data-kind="virtuous" class="p ${lp.kind==='virtuous'?'on':''}">선순환</button></div>`:''}</div></div>`).join('')
-  : (S.links.length? '<p class="empty">아직 닫힌 고리가 없습니다. 결과가 다시 원인에 영향을 주는 화살표를 찾아보세요. 문제가 반복된다면 어딘가에 고리가 있습니다.</p>':''); }
+ $('#loopList').innerHTML= loopsCache.length? loopsCache.map(lp=>`<div class="loop ${lp.type} ${lp.kind} ${focusKeys.has(lp.key)?'focus':''}" data-key="${lp.key}" role="button" tabindex="0" title="누르면 이 루프만 선명하게 보입니다"><div class="lab">${lp.label}</div><div><div class="path">${lp.nodes.map(vname).map(esc).join(' → ')} → ${esc(vname(lp.nodes[0]))}</div><div class="meaning">${loopMeaning(lp)}</div>${lp.type==='R'?`<div class="kind"><button type="button" data-kind="vicious" class="v ${lp.kind==='vicious'?'on':''}">악순환</button><button type="button" data-kind="virtuous" class="p ${lp.kind==='virtuous'?'on':''}">선순환</button></div>`:''}</div></div>`).join('')
+  : (S.links.length? '<p class="empty">아직 닫힌 루프가 없습니다. 결과가 다시 원인에 영향을 주는 화살표를 찾아보세요. 문제가 반복된다면 어딘가에 루프가 있습니다.</p>':''); }
 
 $('#loopList').addEventListener('click',e=>{ const card=e.target.closest('.loop'); if(!card) return; const kb=e.target.closest('button[data-kind]'); if(kb){ S.loopKind=S.loopKind||{}; S.loopKind[card.dataset.key]=kb.dataset.kind; save(); renderCLDStep(); return; } toggleFocus(card.dataset.key); });
 $('#loopList').addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ const card=e.target.closest('.loop'); if(card&&e.target===card){ e.preventDefault(); toggleFocus(card.dataset.key); } } });
 
 
-/* ---------- 원형 미니 인과지도 ---------- */
+/* ---------- 원형 미니 인과순환지도 ---------- */
 const MINI={
  fix:{n:[{i:'s',l:'문제 증상',x:.22,y:.3},{i:'f',l:'미봉책(증상 처방)',x:.74,y:.3},{i:'u',l:'의도치 않은 결과',x:.5,y:.84}],e:[['s','f','+'],['f','s','-'],['f','u','+',1],['u','s','+']]},
- shift:{n:[{i:'y',l:'외부 개입(대증 처방)',x:.3,y:.14},{i:'s',l:'문제 증상',x:.3,y:.5},{i:'f',l:'내부 해결(근본 해결)',x:.3,y:.86},{i:'e',l:'외부 개입 의존',x:.8,y:.5}],e:[['s','y','+'],['y','s','-'],['s','f','+',1],['f','s','-'],['y','e','+'],['e','f','-']]},
+ shift:{H:230,n:[{i:'y',l:'외부 개입(대증 처방)',x:.3,y:.1},{i:'s',l:'문제 증상',x:.3,y:.5},{i:'f',l:'내부 해결(근본 해결)',x:.3,y:.9},{i:'e',l:'외부 개입 의존',x:.8,y:.5}],e:[['s','y','+'],['y','s','-'],['s','f','+',1],['f','s','-'],['y','e','+'],['e','f','-']]},
  limits:{n:[{i:'e',l:'노력',x:.16,y:.56},{i:'p',l:'성과',x:.5,y:.56},{i:'a',l:'제약 행동',x:.84,y:.56},{i:'c',l:'제약 조건',x:.84,y:.14}],e:[['e','p','+'],['p','e','+'],['p','a','+'],['a','p','-'],['c','a','+']]},
  erode:{n:[{i:'g',l:'목표',x:.24,y:.14},{i:'p',l:'목표 낮추기 압력',x:.76,y:.14},{i:'k',l:'격차',x:.5,y:.5},{i:'r',l:'현실',x:.24,y:.86},{i:'a',l:'교정 행동',x:.76,y:.86}],e:[['g','k','+'],['k','p','+'],['p','g','-'],['k','a','+',1],['a','r','+'],['r','k','-']]},
  escal:{n:[{i:'a',l:'A의 활동',x:.1,y:.5},{i:'ra',l:'A의 성과',x:.3,y:.14},{i:'ta',l:'A가 느끼는 위협',x:.3,y:.86},{i:'q',l:'A의 상대적 우위',x:.5,y:.5},{i:'rb',l:'B의 성과',x:.7,y:.14},{i:'tb',l:'B가 느끼는 위협',x:.7,y:.86},{i:'b',l:'B의 활동',x:.9,y:.5}],e:[['a','ra','+'],['ra','q','+'],['q','ta','-'],['ta','a','+'],['q','tb','+'],['tb','b','+'],['b','rb','+'],['rb','q','-']]},
  success:{n:[{i:'sa',l:'A의 성공',x:.2,y:.18},{i:'ra',l:'A에게 자원',x:.2,y:.82},{i:'al',l:'B 대신 A에게 배분',x:.5,y:.5},{i:'sb',l:'B의 성공',x:.8,y:.18},{i:'rb',l:'B에게 자원',x:.8,y:.82}],e:[['ra','sa','+'],['sa','al','+'],['al','ra','+'],['al','rb','-'],['rb','sb','+'],['sb','al','-']]},
- commons:{n:[{i:'ga',l:'A의 순이익',x:.2,y:.1},{i:'a',l:'A의 활동',x:.2,y:.38},{i:'t',l:'총 활동',x:.46,y:.5},{i:'u',l:'활동당 이득',x:.72,y:.5},{i:'lim',l:'자원 한계',x:.9,y:.2},{i:'b',l:'B의 활동',x:.2,y:.62},{i:'gb',l:'B의 순이익',x:.2,y:.9}],e:[['a','ga','+'],['ga','a','+'],['b','gb','+'],['gb','b','+'],['a','t','+'],['b','t','+'],['t','u','-',1],['u','ga','+'],['u','gb','+'],['lim','u','+']]},
+ commons:{W:300,H:330,n:[{i:'ga',l:'A의 순이익',x:.3,y:.06},{i:'a',l:'A의 활동',x:.3,y:.29},{i:'t',l:'총 활동',x:.08,y:.5},{i:'u',l:'활동당 이득',x:.62,y:.5},{i:'lim',l:'자원 한계',x:.9,y:.4},{i:'b',l:'B의 활동',x:.3,y:.71},{i:'gb',l:'B의 순이익',x:.3,y:.94}],e:[['a','ga','+'],['ga','a','+'],['b','gb','+'],['gb','b','+'],['a','t','+'],['b','t','+'],['t','u','-',1,-20],['u','a','-'],['u','b','-'],['u','ga','+'],['u','gb','+'],['lim','u','+']]},
  under:{n:[{i:'g',l:'성장 노력',x:.14,y:.3},{i:'d',l:'수요',x:.42,y:.12},{i:'p',l:'성과',x:.46,y:.5},{i:'st',l:'성과 기준',x:.88,y:.3},{i:'n',l:'투자 필요 인식',x:.8,y:.62},{i:'inv',l:'역량 투자',x:.6,y:.9},{i:'c',l:'역량',x:.26,y:.82}],e:[['g','d','+'],['d','g','+'],['d','p','-'],['p','g','+'],['p','n','-'],['st','n','+'],['n','inv','+',1],['inv','c','+',1],['c','p','+']]}};
-function miniCLD(spec){ const W=300,H=180; const pal={r:cssColor('--r'),b:cssColor('--b'),g:cssColor('--g')};
- const box=l=>({w:Math.max(44,l.length*10.5+14),h:22}); const P={}; spec.n.forEach(n=>P[n.i]={x:n.x*W,y:n.y*H,l:n.l});
+function miniCLD(spec){ const W=spec.W||300,H=spec.H||180; const pal={r:cssColor('--r'),b:cssColor('--b'),g:cssColor('--g')}; const bb={x0:1e9,y0:1e9,x1:-1e9,y1:-1e9}; const grow=(x,y,m)=>{ m=m||0; bb.x0=Math.min(bb.x0,x-m); bb.y0=Math.min(bb.y0,y-m); bb.x1=Math.max(bb.x1,x+m); bb.y1=Math.max(bb.y1,y+m); };
+ const box=l=>({w:Math.max(30,l.length*10.5+5),h:16}); const P={}; spec.n.forEach(n=>P[n.i]={x:n.x*W,y:n.y*H,l:n.l});
  const loopOf={}; spec.e.forEach(e=>{ loopOf[e[0]+'|'+e[1]]=null; });
- // 각 화살표의 색: 어느 고리에 속하는지 간단 탐색(미니 지도는 작으므로 전수 탐색)
+ // 각 화살표의 색: 어느 루프에 속하는지 간단 탐색(미니 지도는 작으므로 전수 탐색)
  const ids=spec.n.map(n=>n.i); const adj={}; ids.forEach(i=>adj[i]=[]); spec.e.forEach(e=>adj[e[0]].push(e));
  const edgeCols={}; const seen=new Set(); const mloops=[];
  ids.forEach(s0=>{ const st=[s0],on=new Set([s0]),es=[]; (function dfs(u){ for(const e of adj[u]){ const v=e[1]; if(ids.indexOf(v)<ids.indexOf(s0)) continue; if(v===s0){ const path=[...es,e]; const key=path.map(x=>x[0]+'|'+x[1]).sort().join(','); if(seen.has(key)) continue; seen.add(key); const neg=path.filter(x=>x[2]==='-').length; const col= neg%2? pal.g : pal.r; path.forEach(x=>{ const k=x[0]+'|'+x[1]; (edgeCols[k]=edgeCols[k]||new Set()).add(col); }); mloops.push({key,type:neg%2?'B':'R',nodes:[...st],col}); } else if(!on.has(v)&&st.length<8){ st.push(v); on.add(v); es.push(e); dfs(v); st.pop(); on.delete(v); es.pop(); } } })(s0); });
- mloops.sort((a,b)=>a.nodes.length-b.nodes.length); let rr=0,bb=0; const centroids={__mini:true}; const edgeLp={}; mloops.forEach(lp=>{ lp.label=lp.type+(lp.type==='R'?++rr:++bb); centroids[lp.key]=loopGeom(lp.nodes.map(i=>P[i])); lp.nodes.forEach((n,i)=>{ const m=lp.nodes[(i+1)%lp.nodes.length]; const k=n+'|'+m; (edgeLp[k]=edgeLp[k]||[]).push(lp); }); });
- const pair={}; spec.e.forEach(e=>pair[e[1]+'|'+e[0]]=true); const markers={}; let out='';
- spec.e.forEach(e=>{ const a=P[e[0]],c=P[e[1]]; const ba=box(a.l),bc=box(c.l); const ctrl=bendFor(a,c,edgeLp[e[0]+'|'+e[1]]||[],centroids,pair[e[0]+'|'+e[1]],0.1,1);
+ mloops.sort((a,b)=>a.nodes.length-b.nodes.length); let rr=0,bn=0; const centroids={__mini:true}; const edgeLp={}; mloops.forEach(lp=>{ lp.label=lp.type+(lp.type==='R'?++rr:++bn); centroids[lp.key]=loopGeom(lp.nodes.map(i=>P[i])); lp.nodes.forEach((n,i)=>{ const m=lp.nodes[(i+1)%lp.nodes.length]; const k=n+'|'+m; (edgeLp[k]=edgeLp[k]||[]).push(lp); }); });
+ const pair={}; spec.e.forEach(e=>pair[e[1]+'|'+e[0]]=true); const markers={}; let out=''; const epts=[];
+ spec.e.forEach(e=>{ const a=P[e[0]],c=P[e[1]]; const ba=box(a.l),bc=box(c.l); const ctrl=bendFor(a,c,edgeLp[e[0]+'|'+e[1]]||[],centroids,pair[e[0]+'|'+e[1]],0.1,1,(typeof e[4]==='number')?e[4]:null);
   const P0=hit(a,ba,norm(ctrl.x-a.x,ctrl.y-a.y)), P2=hit(c,bc,norm(ctrl.x-c.x,ctrl.y-c.y)); const cols=[...(edgeCols[e[0]+'|'+e[1]]||[])]; const col= cols.length? mixColors(cols) : cssColor('--muted'); const id='mm'+col.replace('#',''); markers[id]=col;
   out+=`<path d="M${P0.x} ${P0.y} Q${ctrl.x} ${ctrl.y} ${P2.x} ${P2.y}" fill="none" stroke="${col}" stroke-width="1.6" marker-end="url(#${id})"/>`;
-  const q=t=>({x:(1-t)*(1-t)*P0.x+2*(1-t)*t*ctrl.x+t*t*P2.x,y:(1-t)*(1-t)*P0.y+2*(1-t)*t*ctrl.y+t*t*P2.y}); const sp=q(.8); const tg=norm(2*(1-.8)*(ctrl.x-P0.x)+2*.8*(P2.x-ctrl.x),2*(1-.8)*(ctrl.y-P0.y)+2*.8*(P2.y-ctrl.y));
+  const q=t=>({x:(1-t)*(1-t)*P0.x+2*(1-t)*t*ctrl.x+t*t*P2.x,y:(1-t)*(1-t)*P0.y+2*(1-t)*t*ctrl.y+t*t*P2.y}); [0.1,0.25,0.5,0.75,0.9].forEach(t=>{ const z=q(t); grow(z.x,z.y,4); }); for(let t=.15;t<.9;t+=.1) epts.push(q(t)); const sp=q(.8); grow(sp.x,sp.y,12); const tg=norm(2*(1-.8)*(ctrl.x-P0.x)+2*.8*(P2.x-ctrl.x),2*(1-.8)*(ctrl.y-P0.y)+2*.8*(P2.y-ctrl.y));
   out+=`<text x="${sp.x-tg.y*9}" y="${sp.y+tg.x*9+4.5}" text-anchor="middle" font-size="13" font-weight="800" fill="${e[2]==='+'?pal.r:pal.b}" stroke="var(--panel2)" stroke-width="3" style="paint-order:stroke">${e[2]==='+'?'+':'−'}</text>`;
   if(e[3]){ const m=q(.55); const tm=norm(ctrl.x-P0.x+P2.x-ctrl.x,ctrl.y-P0.y+P2.y-ctrl.y); for(const o of[-2.5,2.5]) out+=`<line x1="${m.x+tm.x*o-tm.y*5}" y1="${m.y+tm.y*o+tm.x*5}" x2="${m.x+tm.x*o+tm.y*5}" y2="${m.y+tm.y*o-tm.x*5}" stroke="${col}" stroke-width="1.6"/>`; } });
- spec.n.forEach(n=>{ const p=P[n.i], b=box(n.l); out+=`<rect x="${p.x-b.w/2}" y="${p.y-b.h/2}" width="${b.w}" height="${b.h}" rx="5" fill="var(--panel)" stroke="var(--line)"/><text x="${p.x}" y="${p.y+4}" text-anchor="middle" font-size="10.5" fill="var(--fg)">${esc(n.l)}</text>`; });
- const placed=[]; mloops.forEach(lp=>{ const g=centroids[lp.key]; let cx=g.cx; while(placed.some(q=>Math.hypot(q.x-cx,q.y-g.cy)<24)) cx+=26; placed.push({x:cx,y:g.cy}); out+=loopArc(cx,g.cy,10,g.cw,lp.col,lp.label,9); });
+ spec.n.forEach(n=>{ const p=P[n.i], b=box(n.l); grow(p.x-b.w/2,p.y-b.h/2); grow(p.x+b.w/2,p.y+b.h/2); out+=`<rect x="${p.x-b.w/2}" y="${p.y-b.h/2}" width="${b.w}" height="${b.h}" rx="4" fill="var(--panel)" stroke="var(--line)"/><text x="${p.x}" y="${p.y+4}" text-anchor="middle" font-size="10.5" fill="var(--fg)">${esc(n.l)}</text>`; });
+ const placed=[]; const rects=spec.n.map(n=>{ const p=P[n.i], b=box(n.l); return {x0:p.x-b.w/2-13,y0:p.y-b.h/2-13,x1:p.x+b.w/2+13,y1:p.y+b.h/2+13}; });
+ const bad=(x,y)=> rects.some(r=>x>r.x0&&x<r.x1&&y>r.y0&&y<r.y1) || placed.some(q=>Math.hypot(q.x-x,q.y-y)<24) || epts.some(q=>Math.hypot(q.x-x,q.y-y)<15);
+ mloops.forEach(lp=>{ const g=centroids[lp.key]; let cx=g.cx, cy=g.cy; const tries=[[0,0],[22,0],[-22,0],[0,22],[0,-22],[22,22],[-22,22],[22,-22],[-22,-22],[44,0],[-44,0],[0,44],[0,-44]]; for(const [dx,dy] of tries){ if(!bad(g.cx+dx,g.cy+dy)){ cx=g.cx+dx; cy=g.cy+dy; break; } } placed.push({x:cx,y:cy}); grow(cx,cy,17); out+=loopArc(cx,cy,10,g.cw,lp.col,lp.label,9); });
  const defs='<defs>'+loopMarkerDefs([pal.r,pal.g],3.4)+Object.entries(markers).map(([id,col])=>`<marker id="${id}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${col}"/></marker>`).join('')+'</defs>';
- return `<svg class="mini" viewBox="0 0 ${W} ${H}" role="img" aria-label="원형의 인과순환지도">${defs}${out}</svg>`; }
+ const vx=Math.floor(bb.x0-6), vy=Math.floor(bb.y0-6), vw=Math.ceil(bb.x1-bb.x0+12), vh=Math.ceil(bb.y1-bb.y0+12);
+ return `<svg class="mini" viewBox="${vx} ${vy} ${vw} ${vh}" role="img" aria-label="원형의 인과순환지도">${defs}${out}</svg>`; }
 
 /* ---------- 원형 ---------- */
 function archSuggest(){ const R=loopsCache.filter(l=>l.type==='R').length,B=loopsCache.filter(l=>l.type==='B').length; if(!loopsCache.length) return [];
  return ARCH.map(a=>({id:a.id,d:Math.abs((a.sig.R||0)-R)+Math.abs((a.sig.B||0)-B)})).sort((x,y)=>x.d-y.d).filter(x=>x.d<=1).slice(0,3).map(x=>x.id); }
 function renderArch(){ loopsCache=findLoops(); const R=loopsCache.filter(l=>l.type==='R').length,B=loopsCache.filter(l=>l.type==='B').length; const sug=archSuggest();
- $('#archSummary').innerHTML= loopsCache.length? `내 지도에는 강화 고리 <b>${R}</b>개, 균형 고리 <b>${B}</b>개가 있습니다. 고리 구성이 비슷한 원형에 <span class="tag">구조가 닮음</span> 표시를 했습니다. 설명과 신호를 읽고 가장 닮은 것을 고르세요.` : '아직 닫힌 고리가 없어도 설명과 신호를 읽고 가장 닮은 원형을 고를 수 있습니다.';
- $('#archGrid').innerHTML=ARCH.map(a=>`<div class="acard ${S.arch===a.id?'sel':''} ${sug.includes(a.id)?'sug':''}" data-id="${a.id}" role="button" tabindex="0"><h3>${a.name} ${sug.includes(a.id)?'<span class="tag">구조가 닮음</span>':''}</h3><div class="sig">고리 구성: ${a.sig.R?'R×'+a.sig.R:''} ${a.sig.B?'B×'+a.sig.B:''}</div><p style="font-size:.88rem">${a.structure}</p>${MINI[a.id]?miniCLD(MINI[a.id]):''}<ul>${a.signals.map(s=>`<li>${s}</li>`).join('')}</ul><div class="lv"><b>지렛대 방향</b> ${a.lever}</div></div>`).join(''); }
+ $('#archSummary').innerHTML= loopsCache.length? `내 지도에는 강화 루프 <b>${R}</b>개, 균형 루프 <b>${B}</b>개가 있습니다. 루프 구성이 비슷한 원형에 <span class="tag">구조가 닮음</span> 표시를 했습니다. 설명과 신호를 읽고 가장 닮은 것을 고르세요.` : '아직 닫힌 루프가 없어도 설명과 신호를 읽고 가장 닮은 원형을 고를 수 있습니다.';
+ $('#archGrid').innerHTML=ARCH.map(a=>`<div class="acard ${S.arch===a.id?'sel':''} ${sug.includes(a.id)?'sug':''}" data-id="${a.id}" role="button" tabindex="0"><h3>${a.name} ${sug.includes(a.id)?'<span class="tag">구조가 닮음</span>':''}</h3><div class="sig">루프 구성: ${a.sig.R?'R×'+a.sig.R:''} ${a.sig.B?'B×'+a.sig.B:''}</div><p style="font-size:.88rem">${a.structure}</p>${MINI[a.id]?miniCLD(MINI[a.id]):''}<ul>${a.signals.map(s=>`<li>${s}</li>`).join('')}</ul><div class="lv"><b>지렛대 방향</b> ${a.lever}</div></div>`).join(''); }
 $('#archGrid').addEventListener('click',e=>{ const c=e.target.closest('.acard'); if(!c) return; S.arch= S.arch===c.dataset.id?'':c.dataset.id; save(); renderArch(); renderNav(); });
 $('#archGrid').addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ const c=e.target.closest('.acard'); if(c){ e.preventDefault(); c.click(); } } });
 
 /* ---------- 지렛대 ---------- */
 function renderLadder(){ $('#ladder').innerHTML=LEVELS.map(L=>`<div class="rung" style="--p:${L.k/8}"><div class="k">${L.k}</div><div><span class="nm">${L.name}</span> <span style="font-size:.84rem;color:var(--muted)">${L.desc}</span><span class="ex">예: ${L.ex}</span></div><div class="bar" title="효과의 크기"></div></div>`).join(''); }
-function targetName(t){ if(t&&t.startsWith('loop:')){ const lp=loopsCache.find(l=>l.label===t.slice(5)); return lp? lp.label+' 고리' : t.slice(5)+' 고리'; } return vname(t); }
+function targetName(t){ if(t&&t.startsWith('loop:')){ const lp=loopsCache.find(l=>l.label===t.slice(5)); return lp? lp.label+' 루프' : t.slice(5)+' 루프'; } return vname(t); }
 function leverScore(l){ const c=l.c||[0,0,0]; const chk=c.reduce((a,b)=>a+b,0); const lv=l.k; let msg,cls;
  if(lv<=2&&chk<2) { msg='낮은 단의 개입이고 점검도 덜 됐습니다. 많은 힘이 들지만 구조는 그대로일 수 있어요.'; cls='warn'; }
  else if(lv<=2) { msg='빠르게 해 볼 수 있는 개입입니다. 다만 수치만 바꾸면 시스템이 금세 적응합니다. 더 높은 단과 함께 쓰세요.'; cls=''; }
  else if(lv>=6&&chk===3) { msg='높은 단의 개입이면서 구조·부작용·지연까지 점검했습니다. 작은 힘으로 큰 변화를 기대할 수 있는 지렛대입니다.'; cls='good'; }
  else if(lv>=6) { msg='높은 단의 개입입니다. 아래 점검 중 비어 있는 항목을 채우면 실패 가능성이 크게 줄어듭니다.'; cls=''; }
- else { msg= chk===3?'중간 단의 개입으로 구조를 바꿉니다. 꾸준히 하면 고리의 방향이 바뀝니다.':'중간 단의 개입입니다. 부작용과 지연을 한 번 더 생각해 보세요.'; cls= chk===3?'good':''; }
+ else { msg= chk===3?'중간 단의 개입으로 구조를 바꿉니다. 꾸준히 하면 루프의 방향이 바뀝니다.':'중간 단의 개입입니다. 부작용과 지연을 한 번 더 생각해 보세요.'; cls= chk===3?'good':''; }
  return {msg,cls}; }
+function renderSensHint(){ const h=$('#sensHint'); if(!h) return; const top=(S.sens||[]).filter(id=>S.vars.some(v=>v.id===id)&&id!==simCoreId()).slice(0,3); h.innerHTML= top.length? `6단계 시뮬레이션에서 핵심 변수를 가장 크게 움직인 변수: ${top.map((id,i)=>`<b>${i+1}. ${esc(vname(id))}</b>`).join(' · ')} — 지렛대의 '어디에' 후보로 먼저 살펴보세요.` : '6단계 시뮬레이션을 돌리면 민감한 변수의 순위가 여기에 표시됩니다.'; }
 function renderLevers(){ loopsCache=findLoops(); const sel=$('#levTarget'); const prev=sel.value;
- sel.innerHTML=S.vars.map(v=>`<option value="${v.id}">${esc(v.name)}</option>`).join('')+loopsCache.map(l=>`<option value="loop:${l.label}">${l.label} 고리 (${l.nodes.map(vname).map(esc).join('→')})</option>`).join(''); if(prev) sel.value=prev;
+ const order=S.sens&&S.sens.length? S.vars.slice().sort((a,b)=>{ const ia=S.sens.indexOf(a.id), ib=S.sens.indexOf(b.id); return (ia<0?99:ia)-(ib<0?99:ib); }) : S.vars;
+ sel.innerHTML=order.map(v=>`<option value="${v.id}">${esc(v.name)}</option>`).join('')+loopsCache.map(l=>`<option value="loop:${l.label}">${l.label} 루프 (${l.nodes.map(vname).map(esc).join('→')})</option>`).join(''); if(prev) sel.value=prev;
  const ls=$('#levLevel'); if(!ls.options.length) ls.innerHTML=LEVELS.map(L=>`<option value="${L.k}">${L.k}단 · ${L.name}</option>`).join('');
  const sorted=S.levers.map((l,i)=>({l,i})).sort((a,b)=>b.l.k-a.l.k);
  $('#leverList').innerHTML= sorted.length? sorted.map(({l,i})=>{ const sc=leverScore(l); const L=LEVELS[l.k-1]; return `<div class="lever" data-i="${i}"><div class="h"><span class="pill" style="background:var(--accent-soft);color:var(--accent)">${l.k}단 ${L.name}</span><b>${esc(l.a)}</b><span class="hint">→ ${esc(targetName(l.t))}</span><button class="x" data-act="del">✕</button></div>
-  <div class="checks"><label><input type="checkbox" data-c="0" ${l.c&&l.c[0]?'checked':''}> 증상이 아니라 구조를 겨냥한다</label><label><input type="checkbox" data-c="1" ${l.c&&l.c[1]?'checked':''}> 다른 고리에 미칠 부작용을 생각했다</label><label><input type="checkbox" data-c="2" ${l.c&&l.c[2]?'checked':''}> 효과가 나타날 때까지의 지연을 안다</label></div>
+  <div class="checks"><label><input type="checkbox" data-c="0" ${l.c&&l.c[0]?'checked':''}> 증상이 아니라 구조를 겨냥한다</label><label><input type="checkbox" data-c="1" ${l.c&&l.c[1]?'checked':''}> 다른 루프에 미칠 부작용을 생각했다</label><label><input type="checkbox" data-c="2" ${l.c&&l.c[2]?'checked':''}> 효과가 나타날 때까지의 지연을 안다</label></div>
   <div class="score ${sc.cls}">${sc.msg}</div></div>`; }).join('') : '<p class="empty">아직 지렛대가 없습니다. 원형의 "지렛대 방향"과 사다리를 보며 하나씩 추가해 보세요.</p>'; }
 $('#btnAddLever').onclick=()=>{ const a=$('#levAction').value.trim(); if(!a){ toast('무엇을 할지 적어 주세요'); $('#levAction').focus(); return; } S.levers.push({t:$('#levTarget').value,k:+$('#levLevel').value,a,c:[0,0,0]}); $('#levAction').value=''; save(); renderLevers(); renderNav(); };
 $('#leverList').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; const i=+b.closest('.lever').dataset.i; S.levers.splice(i,1); save(); renderLevers(); renderNav(); });
@@ -633,12 +776,13 @@ function reportText(){ const a=ARCH.find(x=>x.id===S.arch); const L=[]; L.push(`
  L.push('■ 빙산',`사건: ${S.events}`,`패턴(${S.botLabel}): ${S.pattern}`,`구조: ${S.structure}`,`마음의 모델: ${S.mental}`,'');
  L.push('■ 변수',S.vars.map(v=>(v.core?'★ ':'· ')+v.name).join('\n'),'');
  L.push('■ 인과 관계',S.links.map(l=>`${vname(l.from)} → ${vname(l.to)} (${l.sign})${l.delay?' 지연':''}`).join('\n'),'');
- L.push('■ 피드백 고리',loopsCache.map(lp=>`${lp.label}: ${lp.nodes.map(vname).join(' → ')} → ${vname(lp.nodes[0])}`).join('\n')||'(없음)','');
+ L.push('■ 피드백 루프',loopsCache.map(lp=>`${lp.label}: ${lp.nodes.map(vname).join(' → ')} → ${vname(lp.nodes[0])}`).join('\n')||'(없음)','');
  L.push('■ 시스템 원형',a?`${a.name} — ${S.archNote}`:'(미선택)','');
+ if(S.simNote||(S.sens&&S.sens.length)) L.push('■ 시뮬레이션에서 본 것',S.simNote||'', (S.sens&&S.sens.length)?'민감한 변수: '+S.sens.filter(id=>id!==simCoreId()).slice(0,3).map(vname).join(' > '):'','');
  L.push('■ 지렛대',S.levers.slice().sort((x,y)=>y.k-x.k).map(l=>`[${l.k}단 ${LEVELS[l.k-1].name}] ${l.a} → ${targetName(l.t)}`).join('\n')||'(없음)','');
  L.push('■ 첫 걸음',`이번 주: ${S.first}`,`함께: ${S.who}`,`확인: ${S.signal}`,`점검일: ${S.review}`); return L.join('\n'); }
 function renderReport(){ loopsCache=findLoops(); const a=ARCH.find(x=>x.id===S.arch); const r=$('#report'); const p=s=>s?`<p>${esc(s)}</p>`:'<p class="empty">아직 적지 않았습니다</p>';
- r.innerHTML=`<div class="eyebrow">${esc(S.domain||'영역')}</div><h2>${esc(S.title||'제목 없는 문제')}</h2><div class="meta">${esc(S.duration?S.duration+'째 반복 · ':'')}변수 ${S.vars.length} · 화살표 ${S.links.length} · 고리 ${loopsCache.length}</div>
+ r.innerHTML=`<div class="eyebrow">${esc(S.domain||'영역')}</div><h2>${esc(S.title||'제목 없는 문제')}</h2><div class="meta">${esc(S.duration?S.duration+'째 반복 · ':'')}변수 ${S.vars.length} · 화살표 ${S.links.length} · 루프 ${loopsCache.length}</div>
  <h3>바라는 상태</h3>${p(S.desired)}<h3>지금까지 해 본 것</h3>${p(S.tried)}
  <h3>빙산</h3><ul><li><b>사건</b> ${esc(S.events)||'—'}</li><li><b>패턴</b> ${esc(S.pattern)||'—'}</li><li><b>구조</b> ${esc(S.structure)||'—'}</li><li><b>마음의 모델</b> ${esc(S.mental)||'—'}</li></ul>
  <h3>인과순환지도</h3><svg id="repSvg" viewBox="0 0 ${CW} ${CH}" role="img" aria-label="인과순환지도 요약"></svg>
@@ -663,10 +807,76 @@ function loadSample(sm){ const s=blank(); ['domain','title','situation','desired
  S=s; autoLayout(); save(); go(0); renderAll(); toast('예시를 불러왔습니다. 각 단계를 넘기며 살펴보세요.'); }
 
 /* ---------- 렌더 ---------- */
-function renderStep(){ if(step===1) drawBOT(); if(step===2) renderVars(); if(step===3) renderCLDStep(); if(step===4) renderArch(); if(step===5){ renderLadder(); renderLevers(); } if(step===6) renderReport(); }
+/* ── 6단계: 질적 SD 시뮬레이션 ── */
+const SIM_W={weak:0.3,mid:0.6,strong:1.0};
+function simParams(){ S.sim=S.sim||{}; const p=S.sim; if(p.shock==null) p.shock=20; if(!p.horizon) p.horizon=48; if(!p.delay) p.delay=4; if(!p.w) p.w={}; if(p.showBot==null) p.showBot=true; return p; }
+function simCoreId(){ const p=simParams(); if(p.core&&S.vars.some(v=>v.id===p.core)) return p.core; const c=S.vars.find(v=>v.core)||S.vars[0]; return c?c.id:null; }
+function simulate(shockId,shock){
+ const p=simParams(), ids=S.vars.map(v=>v.id), n=ids.length, idx={}; ids.forEach((id,i)=>idx[id]=i);
+ const T=p.horizon, X=Array.from({length:T+1},()=>new Float64Array(n).fill(50));
+ if(shockId!=null&&idx[shockId]!=null) X[0][idx[shockId]]=50+shock;
+ const L=S.links.filter(l=>idx[l.from]!=null&&idx[l.to]!=null).map(l=>({a:idx[l.from],b:idx[l.to],s:l.sign==='-'?-1:1,d:l.delay?p.delay:0,w:SIM_W[p.w[l.from+'|'+l.to]||'mid']}));
+ const G=10, K=0.06;
+ for(let t=0;t<T;t++){ const cur=X[t], nx=X[t+1]; for(let i=0;i<n;i++) nx[i]=cur[i]-K*(cur[i]-50);
+  for(const l of L){ const src=X[Math.max(0,t-l.d)][l.a]; nx[l.b]+=l.w*l.s*(src-50)/50*G; }
+  for(let i=0;i<n;i++) nx[i]=50+48*Math.tanh((nx[i]-50)/48); }
+ return X;
+}
+function sensitivity(coreId){ const ids=S.vars.map(v=>v.id), ci=ids.indexOf(coreId); if(ci<0) return [];
+ return ids.map(id=>{ const X=simulate(id,10); let s=0; for(let t=1;t<X.length;t++) s+=Math.abs(X[t][ci]-50); return {id,v:s/(X.length-1)}; }).sort((a,b)=>b.v-a.v); }
+function renderSim(){ if(!S.vars.length){ $('#simSvg').innerHTML=`<text x="280" y="120" text-anchor="middle" fill="var(--muted)" font-size="13">3·4단계에서 변수와 화살표를 먼저 만들어 주세요.</text>`; $('#sensSvg').innerHTML=''; $('#simLinks').innerHTML=''; return; }
+ const p=simParams(); const core=simCoreId(); p.core=core; S.simSeen=true;
+ const cs=$('#simCore'); cs.innerHTML=S.vars.map(v=>`<option value="${v.id}" ${v.id===core?'selected':''}>${esc(v.name)}</option>`).join('');
+ $('#simHorizon').value=p.horizon; $('#simShock').value=p.shock; $('#simDelay').value=p.delay; $('#simShowBot').checked=!!p.showBot;
+ $('#simShockVal').textContent=(p.shock>0?'+':'')+p.shock+(p.shock===0?' (충격 없음)':''); $('#simDelayVal').textContent=p.delay+'단계';
+ $('#simLinks').innerHTML=S.links.map(l=>{ const k=l.from+'|'+l.to, w=p.w[k]||'mid'; return `<div class="simlink"><span>${esc(vname(l.from))} → ${esc(vname(l.to))} <b class="${l.sign==='-'?'neg':'pos'}">${l.sign==='-'?'−':'+'}</b>${l.delay?' ‖':''}</span><span class="seg" data-k="${k}">${['weak','mid','strong'].map(x=>`<button type="button" class="${w===x?'on':''}" data-w="${x}">${{weak:'약',mid:'중',strong:'강'}[x]}</button>`).join('')}</span></div>`; }).join('');
+ const X=simulate(core,p.shock), ids=S.vars.map(v=>v.id), ci=ids.indexOf(core), T=X.length-1;
+ const sens=sensitivity(core); S.sens=sens.map(s=>s.id);
+ const others=sens.map(s=>s.id).filter(id=>id!==core).slice(0,3);
+ const cols=[cssColor('--accent'),'#b5452c','#2f6fb0','#6a4ca0'];
+ const W=560,H=240,l=36,r=12,t=14,b=26; const Xs=i=>l+i/T*(W-l-r), Ys=v=>t+(1-v/100)*(H-t-b);
+ let out=`<line x1="${l}" y1="${Ys(50)}" x2="${W-r}" y2="${Ys(50)}" stroke="var(--line)" stroke-dasharray="3 3"/><line x1="${l}" y1="${t}" x2="${l}" y2="${H-b}" stroke="var(--line)"/><line x1="${l}" y1="${H-b}" x2="${W-r}" y2="${H-b}" stroke="var(--line)"/><text x="${l-4}" y="${Ys(50)+4}" text-anchor="end" font-size="10" fill="var(--muted)">기준</text><text x="${W-r}" y="${H-6}" text-anchor="end" font-size="10" fill="var(--muted)">시간 →</text><text x="${l-4}" y="${t+8}" text-anchor="end" font-size="10" fill="var(--muted)">높음</text><text x="${l-4}" y="${H-b}" text-anchor="end" font-size="10" fill="var(--muted)">낮음</text>`;
+ if(p.showBot&&S.bot&&S.bot.length>1){ const pts=S.bot.slice().sort((a,c)=>a.t-c.t); out+=`<polyline points="${pts.map(q=>`${l+q.t*(W-l-r)},${Ys(q.v*100)}`).join(' ')}" fill="none" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 4" opacity=".7"/>`; }
+ const series=[core,...others]; series.forEach((id,si)=>{ const j=ids.indexOf(id); out+=`<polyline points="${X.map((row,i)=>`${Xs(i)},${Ys(row[j])}`).join(' ')}" fill="none" stroke="${cols[si]}" stroke-width="${si?1.6:2.6}" opacity="${si?.85:1}"/>`; });
+ $('#simSvg').innerHTML=out;
+ $('#simLegend').innerHTML=series.map((id,si)=>`<span style="color:${cols[si]};font-weight:${si?500:700}">● ${esc(vname(id))}</span>`).join(' &nbsp; ')+(p.showBot&&S.bot&&S.bot.length>1?' &nbsp; <span style="color:var(--muted)">┄ 손으로 그린 패턴</span>':'');
+ const mx=sens[0]?.v||1, rowH=22; const sv=$('#sensSvg'); sv.setAttribute('viewBox',`0 0 560 ${sens.length*rowH+8}`);
+ sv.innerHTML=sens.map((s,i)=>{ const w=Math.max(2,(s.v/mx)*330), y=4+i*rowH; const self=s.id===core; return `<text x="200" y="${y+15}" text-anchor="end" font-size="12" fill="${self?'var(--muted)':'var(--fg)'}">${esc(vname(s.id))}${self?' (핵심)':''}</text><rect x="208" y="${y+3}" width="${w}" height="${rowH-7}" rx="3" fill="${self?'var(--line)':(i<3?'var(--accent)':'color-mix(in srgb,var(--accent) 45%,transparent)')}"/><text x="${212+w}" y="${y+15}" font-size="11" fill="var(--muted)">${Math.round(s.v/mx*100)}</text>`; }).join('');
+ save(); }
+$('#simCore').addEventListener('change',e=>{ simParams().core=e.target.value; renderSim(); });
+$('#simHorizon').addEventListener('change',e=>{ simParams().horizon=+e.target.value; renderSim(); });
+$('#simShock').addEventListener('input',e=>{ simParams().shock=+e.target.value; renderSim(); });
+$('#simDelay').addEventListener('input',e=>{ simParams().delay=+e.target.value; renderSim(); });
+$('#simShowBot').addEventListener('change',e=>{ simParams().showBot=e.target.checked; renderSim(); });
+$('#simReset').addEventListener('click',()=>{ const c=simParams().core; S.sim={core:c}; renderSim(); toast('기본값으로 되돌렸습니다'); });
+$('#simLinks').addEventListener('click',e=>{ const b=e.target.closest('button[data-w]'); if(!b) return; simParams().w[b.closest('.seg').dataset.k]=b.dataset.w; renderSim(); });
+function renderStep(){ if(step===1) drawBOT(); if(step===2) renderVars(); if(step===3) renderCLDStep(); if(step===4) renderArch(); if(step===5) renderSim(); if(step===6){ renderLadder(); renderLevers(); renderSensHint(); } if(step===7) renderReport(); }
 function renderAll(){ fillFields(); renderNav(); renderStep(); }
+/* ── 음성 입력(Web Speech API) ── */
+(function(){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition; let rec=null, cur=null, base='';
+ function stop(){ if(rec){ try{ rec.stop(); }catch(e){} } }
+ function setOn(btn,on){ $$('.mic.on').forEach(b=>b.classList.remove('on')); if(on&&btn) btn.classList.add('on'); }
+ function start(el,btn){
+  if(!SR){ toast('이 브라우저는 음성 입력을 지원하지 않습니다. 크롬이나 엣지에서 열어 주세요.'); return; }
+  if(cur===el&&rec){ stop(); return; }
+  stop(); cur=el; base=el.value? el.value.replace(/\s+$/,'')+' ' : '';
+  rec=new SR(); rec.lang='ko-KR'; rec.continuous=true; rec.interimResults=true;
+  rec.onstart=()=>{ setOn(btn,true); toast('듣고 있습니다. 다시 누르면 멈춥니다.'); };
+  rec.onresult=ev=>{ let fin='',tmp=''; for(let i=0;i<ev.results.length;i++){ const r=ev.results[i]; if(r.isFinal) fin+=r[0].transcript; else tmp+=r[0].transcript; }
+   el.value=(base+fin+tmp).replace(/\s+/g,' ').trimStart(); el.dispatchEvent(new Event('input',{bubbles:true})); };
+  rec.onerror=ev=>{ const m={'not-allowed':'마이크 사용이 허용되지 않았습니다. 주소창의 마이크 권한을 허용하거나, 내려받은 파일을 직접 열어 사용해 주세요.','audio-capture':'마이크를 찾을 수 없습니다.','network':'음성 인식 서버에 연결할 수 없습니다(인터넷 연결 필요).','no-speech':'음성이 들리지 않았습니다.'}[ev.error]; if(m) toast(m); };
+  rec.onend=()=>{ setOn(null,false); if(cur===el&&el.value) el.value=el.value.trim(); rec=null; cur=null; };
+  try{ rec.start(); }catch(e){ toast('음성 입력을 시작할 수 없습니다.'); rec=null; cur=null; }
+ }
+ $$('label.f[for]').forEach(lb=>{ const el=document.getElementById(lb.htmlFor); if(!el) return; if(!(el.tagName==='TEXTAREA'||(el.tagName==='INPUT'&&el.type==='text'))) return;
+  const b=document.createElement('button'); b.type='button'; b.className='mic'; b.title='음성으로 입력'; b.setAttribute('aria-label','음성으로 입력'); b.textContent='🎤'; if(!SR) b.title='이 브라우저는 음성 입력을 지원하지 않습니다';
+  b.addEventListener('click',e=>{ e.preventDefault(); start(el,b); }); lb.appendChild(b); });
+ const vi=$('#varInput'); if(vi){ const b=document.createElement('button'); b.type='button'; b.className='mic'; b.title='음성으로 입력'; b.textContent='🎤'; b.addEventListener('click',()=>start(vi,b)); vi.insertAdjacentElement('afterend',b); }
+})();
 load(); go(0); renderAll();
 })();
 </script>
 
-</body></html>
+</body>
+</html>
