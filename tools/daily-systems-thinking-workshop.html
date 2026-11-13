@@ -126,6 +126,7 @@ section.step{background:var(--panel);border:1px solid var(--line);border-radius:
 .signsel button.on.neg{background:var(--b-soft);border-color:var(--b);color:var(--b)}
 .canvas{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel);overflow:hidden;min-width:0}
 .canvas svg{width:100%;height:auto;display:block;touch-action:none;font-family:var(--body)}
+.canvas .edge .bendh{opacity:0;transition:opacity .15s} .canvas .edge:hover .bendh,.canvas .edge.on .bendh{opacity:1}
 .canvas .bar{display:flex;gap:8px;justify-content:space-between;align-items:center;padding:8px 10px;border-top:1px solid var(--line2);font-size:.84rem;color:var(--muted);flex-wrap:wrap}
 .links{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:4px;font-size:.88rem}
 .links li{display:flex;gap:8px;align-items:center;padding:4px 8px;border-radius:6px;background:var(--panel2)}
@@ -230,6 +231,7 @@ footer.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
       <option value="0">가정 · 자녀 스마트폰 갈등</option>
       <option value="1">학교 · 행정 업무와 수업 준비</option>
       <option value="2">사회 · 청소년 SNS와 수면</option>
+      <option value="3">사회·학교 · 교직의 위상</option>
     </select>
     <button class="btn" id="btnGuide">사용 안내</button>
     <button class="btn" id="btnIO">저장·불러오기</button>
@@ -351,7 +353,7 @@ footer.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
     <div>
       <div class="canvas">
         <svg id="cldSvg" viewBox="0 0 720 460" role="img" aria-label="인과순환지도"></svg>
-        <div class="bar"><span><span class="legend"><span>상자를 끌어 옮길 수 있습니다. 부호 <b style="color:var(--r)">+</b> <b style="color:var(--b)">−</b>, ∥는 지연.</span><span><i style="background:var(--r)"></i>악순환 R</span><span><i style="background:var(--b)"></i>선순환 R</span><span><i style="background:var(--g)"></i>균형 B</span><span><i style="background:#8a4fa3"></i>겹침은 혼합색</span><span>루프 서술이나 R·B 기호를 누르면 그 루프만 선명해집니다. 화살표 가운데 점을 끌면 그 화살표의 휨이 바뀌고, 두 번 누르면 자동으로 돌아갑니다.</span></span></span><span style="display:flex;gap:8px;align-items:center"><label for="bendRange" style="font-size:.84rem">휘어짐</label><input type="range" id="bendRange" min="0.3" max="2.5" step="0.1" value="1" style="width:110px"><button class="btn small" id="btnAutoLayout">자동 배치</button></span></div>
+        <div class="bar"><span><span class="legend"><span>상자를 끌어 옮길 수 있습니다. 부호 <b style="color:var(--r)">+</b> <b style="color:var(--b)">−</b>, ∥는 지연.</span><span><i style="background:var(--r)"></i>악순환 R</span><span><i style="background:var(--b)"></i>선순환 R</span><span><i style="background:var(--g)"></i>균형 B</span><span><i style="background:#8a4fa3"></i>겹침은 혼합색</span><span>루프 서술이나 R·B 기호를 누르면 그 루프만 선명해집니다. 화살표에 가까이 가면 가운데 점이 나타납니다. 그 점이나 화살표를 끌면 휨이 바뀌고, 두 번 누르면 자동으로 돌아갑니다.</span></span></span><span style="display:flex;gap:8px;align-items:center"><label for="bendRange" style="font-size:.84rem">휘어짐</label><input type="range" id="bendRange" min="0.3" max="2.5" step="0.1" value="1" style="width:110px"><button class="btn small" id="btnAutoLayout">자동 배치</button></span></div>
       </div>
       <div class="loops" id="loopList"></div>
     </div>
@@ -454,7 +456,7 @@ footer.nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px}
 <h4>1 문제 정하기</h4><ul><li>&#x27;그 사람이 문제&#x27;가 아니라 &#x27;이런 일이 반복된다&#x27;로 씁니다.</li><li>해 본 해결책과 그 결과를 꼭 적습니다. 잠깐 좋아졌다 돌아온 해결책이 가장 좋은 단서입니다.</li></ul>
 <h4>2 빙산</h4><ul><li>변화 그래프는 정확할 필요가 없습니다. 톱니·하락·정체·진동 가운데 어느 모양에 가까운지가 중요합니다.</li><li>마음의 모델은 따옴표로 쓰면 드러나기 쉽습니다. 예: &quot;통제하지 않으면 끝없이 한다&quot;.</li></ul>
 <h4>3 변수</h4><ul><li>명사형으로, 늘거나 줄 수 있게, 판단을 빼고 씁니다. &#x27;게으름&#x27; 대신 &#x27;휴식 시간&#x27;, &#x27;잔소리&#x27; 대신 &#x27;통제 시도 횟수&#x27;.</li><li>추천 칩을 눌러 넣어도 됩니다. 자료를 올렸다면 자료에서 찾은 후보가 앞에 나옵니다.</li></ul>
-<h4>4 인과순환지도</h4><ul><li>원인이 늘 때 결과도 늘면 +, 반대로 움직이면 −. 효과가 늦게 나타나면 지연(‖)을 켭니다.</li><li>결과가 다시 원인에 영향을 주는 화살표를 찾아 루프를 닫는 것이 목표입니다. − 부호가 짝수 개면 R(강화), 홀수 개면 B(균형)입니다.</li><li>루프 설명이나 R·B 기호를 누르면 그 루프만 선명해집니다. R 루프는 악순환(붉은색)·선순환(푸른색)을 바꿔 표시할 수 있습니다.</li><li>변수 상자는 끌어서 옮기고, 화살표 가운데 손잡이로 휨을, 아래 슬라이더로 전체 휨을 조절합니다.</li></ul>
+<h4>4 인과순환지도</h4><ul><li>원인이 늘 때 결과도 늘면 +, 반대로 움직이면 −. 효과가 늦게 나타나면 지연(‖)을 켭니다.</li><li>결과가 다시 원인에 영향을 주는 화살표를 찾아 루프를 닫는 것이 목표입니다. − 부호가 짝수 개면 R(강화), 홀수 개면 B(균형)입니다.</li><li>루프 설명이나 R·B 기호를 누르면 그 루프만 선명해집니다. R 루프는 악순환(붉은색)·선순환(푸른색)을 바꿔 표시할 수 있습니다.</li><li>변수 상자는 끌어서 옮깁니다. 화살표에 가까이 가면 가운데 손잡이가 나타나며, 손잡이나 화살표를 끌어 휨을, 아래 슬라이더로 전체 휨을 조절합니다.</li></ul>
 <h4>5 원형</h4><ul><li>루프 구성이 닮은 원형에 &#x27;구조가 닮음&#x27; 표시가 붙습니다. 하나로 딱 맞지 않아도 가장 닮은 부분을 고릅니다.</li><li>원형마다 작은 지도와 전형적 실수, 지렛대 방향이 함께 나옵니다. 원형의 설명을 내 변수 이름으로 다시 써 보십시오.</li></ul>
 <h4>6 SD 시뮬레이션</h4><ul><li>숫자에는 뜻이 없습니다. 곡선의 모양과 변수 순위만 읽습니다.</li><li>손으로 그린 패턴과 곡선이 닮았는지 봅니다. 닮지 않았다면 지도에 빠진 루프나 지연이 있는지 4단계로 돌아가 봅니다.</li><li>충격을 반대 방향으로 주거나 화살표 세기를 약·중·강으로 바꿔 보며 어느 화살표가 결과를 좌우하는지 느껴 봅니다.</li><li>민감도 막대가 긴 변수는 지렛대 후보입니다. 다만 &#x27;움직이기 쉬운 변수&#x27;와 &#x27;바꾸기 쉬운 변수&#x27;는 다릅니다.</li></ul>
 <h4>7 지렛대</h4><ul><li>사다리 아래쪽(규칙·목표·마음의 모델)일수록 작은 힘으로 큰 변화를 만들지만 바꾸기 어렵습니다. 1~2단(수치 조정)만 있다면 왜 해결책이 되돌아왔는지 보입니다.</li><li>지렛대마다 세 가지 점검을 합니다: 증상이 아니라 구조를 겨냥하는가, 다른 루프에 미칠 부작용을 생각했는가, 효과가 나타날 때까지의 지연을 아는가.</li></ul>
@@ -521,7 +523,14 @@ const SAMPLES=[
   links:[[0,1,'-',0],[1,2,'-',0],[2,0,'+',0],[2,6,'-',0],[3,0,'+',0],[0,3,'+',1],[4,0,'+',0],[0,4,'+',1],[0,5,'+',1],[5,0,'-',0],[5,3,'+',0]],
   arch:'commons',archNote:'학생·가정·플랫폼 각자는 합리적으로 움직이지만, 공동 자원인 청소년의 수면과 또래 관계의 여유가 바닥난다.',
   levers:[{t:'v4',k:6,a:'학급 단위로 밤 11시 이후 알림 끄기를 함께 약속하고 서로 확인하기',c:[1,1,1]},{t:'v1',k:5,a:'학급 수면 시간을 익명으로 모아 매주 함께 보기',c:[1,1,0]},{t:'v3',k:8,a:'"안 보면 소외된다"는 믿음을 학급 토론 주제로 올리기',c:[1,0,1]}],
-  first:'다음 학급회의에서 수면 시간 익명 조사와 11시 알림 끄기 약속을 안건으로 올리기',who:'학급 자치회, 담임, 학부모회',signal:'4주 뒤 평균 수면 시간(익명 조사), 1교시 엎드린 학생 수',review:'11월 넷째 주'}];
+  first:'다음 학급회의에서 수면 시간 익명 조사와 11시 알림 끄기 약속을 안건으로 올리기',who:'학급 자치회, 담임, 학부모회',signal:'4주 뒤 평균 수면 시간(익명 조사), 1교시 엎드린 학생 수',review:'11월 넷째 주'},
+ {domain:'사회',title:'교직에 대한 사회적 신뢰가 해마다 낮아지고, 교사는 점점 방어적으로 가르친다',situation:'민원과 교권 침해 사고가 보도될 때마다 지침과 매뉴얼이 늘어나고, 교사의 수업 재량은 줄어든다. 교사들은 문제가 될 만한 활동을 접고 안전한 수업만 하게 되며, 학부모와의 직접 대화는 줄었다.',desired:'교사의 전문성이 학부모와 사회에 보이고, 갈등이 생겨도 규정보다 대화로 먼저 풀리며, 교사가 자기 수업을 자신 있게 설계한다.',duration:'여러 해',tried:'교권 보호 대책(민원 창구 일원화, 통화 녹음, 분리 조치) → 사고 직후에는 안도감, 그러나 신뢰는 회복되지 않음. 교사 처우 개선 요구 → 일부 반영되었지만 존중의 체감은 그대로.',
+  events:'학부모 민원이 걱정돼 이번 학기 체험 활동 하나를 강의로 대체했다. 같은 주, 교직 만족도 조사가 역대 최저로 보도되었다.',botLabel:'교직에 대한 사회적 신뢰',shape:'down',pattern:'10여 년에 걸친 완만한 하락. 큰 사고가 보도되면 잠깐 관심과 대책이 집중되었다가 다시 하락하는 계단 모양.',structure:'민원 → 지침·규제 강화 → 수업 재량 축소 → 교사 전문성이 보이지 않음 → 신뢰 하락 → 민원 증가. 동시에 민원 → 방어적 대응 → 학부모와의 직접 소통 감소 → 신뢰 하락. 지침과 행정이 늘수록 수업을 연구할 여유가 줄어 전문성을 보일 기회가 더 줄어든다.',mental:'"문제가 생기면 규정으로 막아야 한다", "교사는 지시를 따르는 직원이다", "신뢰는 보호장치가 만들어 준다"',
+  vars:['교직에 대한 사회적 신뢰*','민원·갈등 건수','지침·규제의 양','교사의 수업 재량','교사 전문성의 가시성','교사의 방어적 대응','학부모와의 직접 소통','수업 연구 여유 시간'],
+  links:[[1,2,'+',0],[2,3,'-',0],[3,4,'+',1],[4,0,'+',1],[0,1,'-',0],[1,5,'+',0],[5,6,'-',0],[6,0,'+',0],[2,7,'-',0],[7,4,'+',1]],
+  arch:'shift',archNote:'지침·규제와 보호장치는 민원의 증상을 빠르게 누르지만(대증 처방), 재량과 직접 소통을 줄여 전문성을 보여 주고 관계를 회복하는 근본 해결의 힘을 서서히 약화시킨다. 그 사이 "민원 없는 수업"이 목표가 되어 교육의 기준이 낮아지는 목표 침식도 함께 일어난다.',
+  levers:[{t:'v4',k:5,a:'수업과 학생의 성장을 학부모가 정기적으로 볼 수 있게 하기: 월 1회 학급 소식(수업 한 장면 + 3줄), 학기 1회 수업 공개',c:[1,1,1]},{t:'v2',k:6,a:'민원 처리 규정에 "교사-학부모 직접 대화 선행" 원칙을 넣고, 새 지침을 만들 때 교사 재량 보존 조항을 함께 쓰기',c:[1,1,1]},{t:'v0',k:8,a:'"신뢰는 보호장치가 아니라 보이는 전문성에서 온다"로 교무회의의 질문을 바꾸기: 무엇을 막을까 → 무엇을 보여 줄까',c:[1,0,1]}],
+  first:'이번 주 금요일, 우리 반 학부모에게 이번 주 수업 한 장면을 사진 한 장과 세 줄 글로 보내기',who:'동학년 교사 두 명과 같은 형식으로 시작하고, 부장에게 학년 차원 시도로 알리기',signal:'4주 뒤 학부모 답장의 수와 어조, 상담 요청의 성격(불만 → 질문). 민원 건수는 한 학기 뒤에 보기(지연)',review:'12월 마지막 주 학년 협의회',pos:{v0:[360,45],v1:[620,120],v2:[640,320],v3:[440,430],v4:[150,400],v5:[585,275],v6:[430,205],v7:[300,300]},bend:0.6}];
 
 let S; const KEY='stw-v1'; let step=0; let loopsCache=[];
 function blank(){ return {domain:'',title:'',situation:'',desired:'',duration:'',tried:'',events:'',botLabel:'',bot:[],pattern:'',structure:'',mental:'',vars:[],links:[],pos:{},arch:'',archNote:'',levers:[],first:'',who:'',signal:'',review:'',sign:'+',loopKind:{},bend:1,srcVars:[],simNote:'',sim:{},sens:[],simSeen:false}; }
@@ -679,7 +688,7 @@ function findLoops(){ const ids=S.vars.map(v=>v.id), idx={}; ids.forEach((id,i)=
  loops.sort((a,c)=>a.nodes.length-c.nodes.length); return loops; }
 function nodeBox(name){ return {w:Math.max(76,Math.min(190,name.length*14+26)),h:36}; }
 function hit(c,box,dir){ const dx=dir.x,dy=dir.y; const tx=dx?box.w/2/Math.abs(dx):1e9, ty=dy?box.h/2/Math.abs(dy):1e9; const t=Math.min(tx,ty); return {x:c.x+dx*t,y:c.y+dy*t}; }
-let focusKeys=new Set();
+let focusKeys=new Set(); let bendActive=null;
 function cssColor(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim()||'#888888'; }
 function hexToRgb(h){ h=h.replace('#',''); if(h.length===3) h=h.split('').map(c=>c+c).join(''); return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
 function mixColors(list){ if(!list.length) return cssColor('--muted'); const rgb=list.map(hexToRgb); const m=[0,1,2].map(i=>Math.round(rgb.reduce((a,c)=>a+c[i],0)/rgb.length)); return '#'+m.map(v=>v.toString(16).padStart(2,'0')).join(''); }
@@ -696,13 +705,14 @@ function drawCLD(svg,interactive,mode){ ensurePos(); const report= mode==='repor
   const d1=norm(ctrl.x-a.x,ctrl.y-a.y), d2=norm(ctrl.x-c.x,ctrl.y-c.y); const P0=hit(a,ba,d1), P2=hit(c,bc,d2); const kinds=[...new Set(lps.map(loopColor))]; const col= kinds.length? mixColors(kinds) : cssColor('--muted');
   const inFocus= lps.some(lp=>focusKeys.has(lp.key)); const op= report? 1 : (anyFocus? (inFocus?1:0.12) : (lps.length?0.4:0.3)); const sw= inFocus?3:2;
   const signCol= l.sign==='+'?pal.r:pal.b;
-  edges+=`<g opacity="${op}"><path d="M${P0.x} ${P0.y} Q${ctrl.x} ${ctrl.y} ${P2.x} ${P2.y}" fill="none" stroke="${col}" stroke-width="${sw}" marker-end="${markerFor(col)}"/>`;
+  const li=S.links.indexOf(l); edges+=`<g class="edge ${bendActive===li?'on':''}" data-i="${li}"><g opacity="${op}"><path d="M${P0.x} ${P0.y} Q${ctrl.x} ${ctrl.y} ${P2.x} ${P2.y}" fill="none" stroke="${col}" stroke-width="${sw}" marker-end="${markerFor(col)}"/>`;
   const q=t=>({x:(1-t)*(1-t)*P0.x+2*(1-t)*t*ctrl.x+t*t*P2.x,y:(1-t)*(1-t)*P0.y+2*(1-t)*t*ctrl.y+t*t*P2.y});
   const sp=q(.84); const tg=norm(2*(1-.84)*(ctrl.x-P0.x)+2*.84*(P2.x-ctrl.x),2*(1-.84)*(ctrl.y-P0.y)+2*.84*(P2.y-ctrl.y));
   edges+=`<text x="${sp.x-tg.y*11}" y="${sp.y+tg.x*11+6}" text-anchor="middle" font-size="18" font-weight="800" fill="${signCol}" stroke="var(--panel)" stroke-width="4" paint-order="stroke" style="paint-order:stroke">${l.sign==='+'?'+':'−'}</text>`;
   if(l.delay){ const m=q(.64); const tm=norm(2*(1-.64)*(ctrl.x-P0.x)+2*.64*(P2.x-ctrl.x),2*(1-.64)*(ctrl.y-P0.y)+2*.64*(P2.y-ctrl.y)); for(const o of[-3,3]){ edges+=`<line x1="${m.x+tm.x*o-tm.y*7}" y1="${m.y+tm.y*o+tm.x*7}" x2="${m.x+tm.x*o+tm.y*7}" y2="${m.y+tm.y*o-tm.x*7}" stroke="${col}" stroke-width="2"/>`; } }
   edges+='</g>';
-  if(interactive && !report){ const h=q(.5); const li=S.links.indexOf(l); edges+=`<g class="bendh" data-i="${li}" style="cursor:ns-resize"><circle cx="${h.x}" cy="${h.y}" r="9" fill="transparent"/><circle cx="${h.x}" cy="${h.y}" r="4.5" fill="var(--panel)" stroke="${col}" stroke-width="1.5" opacity="${(typeof l.bend==='number')?1:0.55}"/></g>`; }
+  if(interactive && !report){ const h=q(.5); edges+=`<path class="edgehit" data-i="${li}" d="M${P0.x} ${P0.y} Q${ctrl.x} ${ctrl.y} ${P2.x} ${P2.y}" fill="none" stroke="transparent" stroke-width="18" style="cursor:ns-resize"/><g class="bendh" data-i="${li}" style="cursor:ns-resize"><circle cx="${h.x}" cy="${h.y}" r="9" fill="transparent"/><circle cx="${h.x}" cy="${h.y}" r="4.5" fill="var(--panel)" stroke="${col}" stroke-width="1.5" opacity="${(typeof l.bend==='number')?1:0.55}"/></g>`; }
+  edges+='</g>';
  });
  S.vars.forEach(v=>{ const p=S.pos[v.id]; const b=nodeBox(v.name); const inF= !anyFocus || loopsCache.some(lp=>focusKeys.has(lp.key)&&lp.nodes.includes(v.id)); nodes+=`<g class="node" data-id="${v.id}" opacity="${inF?1:0.35}" style="cursor:${interactive?'grab':'default'}"><rect x="${p.x-b.w/2}" y="${p.y-b.h/2}" width="${b.w}" height="${b.h}" rx="8" fill="${v.core?'var(--accent-soft)':'var(--panel)'}" stroke="${v.core?'var(--accent)':'var(--line)'}" stroke-width="${v.core?2:1.5}"/><text x="${p.x}" y="${p.y+5}" text-anchor="middle" font-size="13" font-weight="${v.core?700:500}" fill="var(--fg)">${esc(v.name)}</text></g>`; });
  const placed=[]; const loopCols=new Set();
@@ -722,11 +732,11 @@ function bendFor(a,c,lps,centroids,pairBack,base,strength,override){ strength=st
  return {x:(a.x+c.x)/2+nx*k*sign, y:(a.y+c.y)/2+ny*k*sign}; }
 function toggleFocus(key){ if(focusKeys.has(key)) focusKeys.delete(key); else focusKeys.add(key); renderCLDStep(); }
 function norm(x,y){ const d=Math.hypot(x,y)||1; return {x:x/d,y:y/d}; }
-(function drag(){ const svg=$('#cldSvg'); let cur=null,off=null,bendCur=null;
- svg.addEventListener('dblclick',e=>{ const h=e.target.closest('.bendh'); if(!h) return; delete S.links[+h.dataset.i].bend; save(); drawCLD(svg,true); });
- svg.addEventListener('pointerdown',e=>{ const h=e.target.closest('.bendh'); if(!h) return; bendCur=+h.dataset.i; svg.setPointerCapture(e.pointerId); e.preventDefault(); });
- svg.addEventListener('pointermove',e=>{ if(bendCur==null) return; const l=S.links[bendCur]; const a=S.pos[l.from], c=S.pos[l.to]; if(!a||!c) return; const p=svgPoint(svg,e); const dx=c.x-a.x, dy=c.y-a.y, d=Math.hypot(dx,dy)||1; const nx=-dy/d, ny=dx/d; const mx=(a.x+c.x)/2, my=(a.y+c.y)/2; const t=(p.x-mx)*nx+(p.y-my)*ny; l.bend=Math.round(Math.max(-1.6*d,Math.min(1.6*d, 2*t))); drawCLD(svg,true); });
- svg.addEventListener('pointerup',()=>{ if(bendCur!=null){ bendCur=null; save(); } });
+(function drag(){ const svg=$('#cldSvg'); let cur=null,off=null;
+ svg.addEventListener('dblclick',e=>{ const h=e.target.closest('.bendh,.edgehit'); if(!h) return; delete S.links[+h.dataset.i].bend; save(); drawCLD(svg,true); });
+ svg.addEventListener('pointerdown',e=>{ const h=e.target.closest('.bendh,.edgehit'); if(!h) return; bendActive=+h.dataset.i; svg.setPointerCapture(e.pointerId); e.preventDefault(); });
+ svg.addEventListener('pointermove',e=>{ if(bendActive==null) return; const l=S.links[bendActive]; const a=S.pos[l.from], c=S.pos[l.to]; if(!a||!c) return; const p=svgPoint(svg,e); const dx=c.x-a.x, dy=c.y-a.y, d=Math.hypot(dx,dy)||1; const nx=-dy/d, ny=dx/d; const mx=(a.x+c.x)/2, my=(a.y+c.y)/2; const t=(p.x-mx)*nx+(p.y-my)*ny; l.bend=Math.round(Math.max(-1.6*d,Math.min(1.6*d, 2*t))); drawCLD(svg,true); });
+ svg.addEventListener('pointerup',()=>{ if(bendActive!=null){ bendActive=null; save(); drawCLD(svg,true); } });
  svg.addEventListener('click',e=>{ const lab=e.target.closest('.looplab'); if(lab) toggleFocus(lab.dataset.key); });
  svg.addEventListener('pointerdown',e=>{ const g=e.target.closest('.node'); if(!g) return; cur=g.dataset.id; const p=svgPoint(svg,e); off={x:S.pos[cur].x-p.x,y:S.pos[cur].y-p.y}; svg.setPointerCapture(e.pointerId); });
  svg.addEventListener('pointermove',e=>{ if(!cur) return; const p=svgPoint(svg,e); S.pos[cur]={x:Math.round(Math.max(60,Math.min(CW-60,p.x+off.x))),y:Math.round(Math.max(24,Math.min(CH-24,p.y+off.y)))}; drawCLD(svg,true); });
@@ -849,7 +859,7 @@ let resetArmed=false; $('#btnReset').onclick=()=>{ if(!resetArmed){ resetArmed=t
 $('#sampleSel').addEventListener('change',e=>{ const i=e.target.value; e.target.value=''; if(i==='') return; loadSample(SAMPLES[+i]); });
 function loadSample(sm){ const s=blank(); ['domain','title','situation','desired','duration','tried','events','botLabel','pattern','structure','mental','archNote','first','who','signal','review'].forEach(k=>s[k]=sm[k]||''); s.bot=botShape(sm.shape);
  s.vars=sm.vars.map((n,i)=>({id:'v'+i,name:n.replace('*',''),core:n.endsWith('*')})); s.links=sm.links.map(([f,t,sg,d])=>({from:'v'+f,to:'v'+t,sign:sg,delay:!!d})); s.arch=sm.arch; s.levers=sm.levers.map(l=>({t:l.t,k:l.k,a:l.a,c:l.c}));
- S=s; autoLayout(); save(); go(0); renderAll(); toast('예시를 불러왔습니다. 각 단계를 넘기며 살펴보세요.'); }
+ S=s; autoLayout(); if(sm.pos){ for(const k in sm.pos) S.pos[k]={x:sm.pos[k][0],y:sm.pos[k][1]}; } if(sm.bend) S.bend=sm.bend; save(); go(0); renderAll(); toast('예시를 불러왔습니다. 각 단계를 넘기며 살펴보세요.'); }
 
 /* ---------- 렌더 ---------- */
 /* ── 6단계: 질적 SD 시뮬레이션 ── */
